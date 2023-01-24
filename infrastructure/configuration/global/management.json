@@ -1,0 +1,8 @@
+{
+  "schema": "configuration/v1",
+  "params": {
+    "globalParams": {
+      "environment":  "remote"
+    }
+  }
+}
