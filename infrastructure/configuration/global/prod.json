@@ -1,0 +1,13 @@
+{
+  "schema": "configuration/v1",
+  "params": {
+    "environmentParams": {
+      "environment":  "prod",
+      "stage": "truehhart",
+      "azLocation": "westeurope",
+      "containerRegistry": {
+        "sku": "Basic"
+      }
+    }
+  }
+}

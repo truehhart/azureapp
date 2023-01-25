@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Azure Application Testing Page</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body style="background-color: papayawhip;">
+  <div class="container">
+    <h1 class="general-text"> Hello World, what's your message?</h1>
+  </div>
+  <div class="container">
+    <button onclick="GetHelloWorldData()" class="click-me-button">Click Me!</button>
+  </div>
+  <div class="container">
+    <div class="description-text-container">
+      <div class="description-text">
+      The button above fetches data from the '/helloworld' method that is populated using the environment variables in the hosting container
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="result-text-container">
+      <div class="result-text" id="result-div">
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  function GetHelloWorldData() {
+      var currenturl = window.location.href.replace('/assets', '');
+      var fresult = "randomstuff";
+      var resultDiv = document.getElementById("result-div")
+
+      fetch(currenturl + 'helloworld')
+        .then(res => res.json())
+        .then(data =>
+          resultDiv.innerHTML = "Result: " + data.output
+        )
+        .catch(err => {throw err});
+  }
+</script>
+</html>

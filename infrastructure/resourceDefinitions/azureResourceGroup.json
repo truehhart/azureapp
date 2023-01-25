@@ -2,7 +2,7 @@
   "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "globalParams": {
+    "environmentParams": {
       "type": "object",
       "metadata": {
         "description": "Global Environment Parameters"
@@ -11,24 +11,25 @@
   },
   "functions": [],
   "resources": [{
-    "name": "resourceGroup",
+    "name": "[concat(parameters('environmentParams')['environment'], '-', parameters('environmentParams')['stage'], '-rg')]",
     "type": "Microsoft.Resources/resourceGroups",
-    "apiVersion": "2021-05-01",
-    "location": "westeu",
+    "apiVersion": "2021-04-01",
+    "location": "[parameters('environmentParams')['azLocation']]",
     "dependsOn": [],
     "tags": {
-      "environment": "[parameters('globalParams')['environment']]",
+      "environment": "[parameters('environmentParams')['environment']]",
+      "stage": "[parameters('environmentParams')['stage']]",
       "createdBy": "Azure Resource Manager Template"
     }
   }],
   "outputs": {
+    "subscriptionName": {
+      "type": "string",
+      "value": "[subscription().displayName]"
+    },
     "subscriptionId": {
       "type": "string",
       "value": "[subscription().subscriptionId]"
-    },
-    "resourceGroup": {
-      "type": "object",
-      "value": "[resourceGroup()]"
     }
   }
 }

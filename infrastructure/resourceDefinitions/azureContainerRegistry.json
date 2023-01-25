@@ -1,0 +1,50 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environmentParams": {
+      "type": "object",
+      "metadata": {
+        "description": "Global Environment Parameters"
+      }
+    }
+  },
+  "functions": [],
+  "resources": [
+    {
+      "name": "[concat(parameters('environmentParams')['environment'], parameters('environmentParams')['stage'], 'ContainerRegistry')]",
+      "type": "Microsoft.ContainerRegistry/registries",
+      "apiVersion": "2019-05-01",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "[parameters('environmentParams')['containerRegistry']['sku']]"
+      },
+      "properties": {
+        "adminUserEnabled": false
+        // "policies": {
+        //   "trustPolicy": {
+        //     "status": "enabled"
+        //   }
+        // },
+        // "networkRuleSet": {
+        //   "defaultAction": "Deny"
+        // }
+      },
+      "tags": {
+        "environment": "[parameters('environmentParams')['environment']]",
+        "stage": "[parameters('environmentParams')['stage']]",
+        "createdBy": "Azure Resource Manager Template"
+      }
+    }
+  ],
+  "outputs": {
+    "subscriptionName": {
+      "type": "string",
+      "value": "[subscription().displayName]"
+    },
+    "subscriptionId": {
+      "type": "string",
+      "value": "[subscription().subscriptionId]"
+    }
+  }
+}

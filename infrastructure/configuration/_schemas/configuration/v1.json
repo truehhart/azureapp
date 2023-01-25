@@ -24,14 +24,14 @@
       "default": {},
       "examples": [
         {
-          "globalParams": {
+          "environmentParams": {
             "environment": "someEnvironment"
           },
           "someParameter": "someValue",
           "anotherParameter": "anotherValue"
         }
       ],
-      "required": ["globalParams"]
+      "required": ["environmentParams"]
     }
   }
 }
