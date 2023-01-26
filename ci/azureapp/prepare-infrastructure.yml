@@ -1,0 +1,34 @@
+trigger:
+  branches:
+    include: ['feature/*']
+  paths:
+    include: ['src/azureapp/']
+
+name: 'build-azureapp-on-changes'
+variables:
+  environment: 'management'
+  stage: 'truehhart'
+  subscriptionName: 'main'
+  appName: 'azureapp'
+  location: 'westeurope'
+
+stages:
+- stage: 'Prepare Infrastructure'
+  jobs: 
+    - job: AzureResourceGroupDeployment@2
+      displayName: '[Azure] Deploy ResourceGroup'
+      inputs:
+        azureSubscription: '$(subscriptionName)'
+        resourceGroupName: '$(environment)-$(stage)-rg'
+        location: '$(location)'
+        csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
+        overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
+
+    - job: AzureResourceGroupDeployment@2
+      displayName: '[Azure] Deploy ContainerRegistry'
+      inputs:
+        azureSubscription: '$(subscriptionName)'
+        resourceGroupName: '$(environment)-$(stage)-rg'
+        location: '$(location)'
+        csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
+        overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'

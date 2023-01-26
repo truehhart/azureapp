@@ -1,9 +1,10 @@
-pr:
+trigger:
   branches:
     include: ['feature/*']
   paths:
     include: ['src/azureapp/']
 
+name: 'build-azureapp-on-changes'
 variables:
   revision:
   # vmImage: 'ubuntu-latest' 

@@ -35,8 +35,9 @@ $scriptPath/../utility/cfgValidator.sh -f $environmentConfigurationFile
 params=$(cat "$environmentConfigurationFile" | jq -c .params)
 
 # Resource-specific deployment configuration
+echo "Starting deployment $(echo $params | jq -r .environmentParams.value.environment)-$moduleName-$(date +%s)..."
 az deployment sub create \
-  --name "$(echo $params | jq -r .environmentParams.value.environment)-$moduleName" \
+  --name "$(echo $params | jq -r .environmentParams.value.environment)-$moduleName-$(date +%s)" \
   --location "$(echo $params | jq -r .environmentParams.value.az.location)" \
   --parameters $params \
   --template-file "$resourceDefinitionsPath/$resourceDefinitionName.json" \

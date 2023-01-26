@@ -1,0 +1,99 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "variables": {
+    "environment": "[resourceGroup().tags.environment]",
+    "stage":     "[resourceGroup().tags.stage]",
+    "location":  "[resourceGroup().location]"
+  },
+  "parameters": {
+    "appName": {"type": "string", "metadata": {"description": "Application name"}},
+    "servicePlanSku": {"type": "string", "metadata": {"description": "SKU For the Service Plan"}, "defaultValue": "Free F1"},
+    "acrEnvironment": {"type": "string", "metadata": {"description": "Environment where Azure Container Registry is Deployed"}},
+    "acrStage":       {"type": "string", "metadata": {"description": "Stage where Azure Container Registry is Deployed"}}
+  },
+  "resources": [
+  {
+    "name": "[concat(variables('environment'), '-', variables('stage'), '-', parameters('appName'), '-serviceplan')]",
+    "type": "Microsoft.Web/serverfarms",
+    "sku": {
+      "Tier": "[first(skip(split(parameters('servicePlanSku'), ' '), 1))]",
+      "Name": "[first(split(parameters('servicePlanSku'), ' '))]"
+    },
+    "kind": "linux",
+    "apiVersion": "2020-12-01",
+    "location": "[resourceGroup().location]",
+    "properties": {
+      "name": "[concat(variables('environment'), '-', variables('stage'), '-', parameters('appName'), '-serviceplan')]",
+      "workerSizeId": "0",
+      "reserved": false,
+      "numberOfWorkers": "1",
+      "hostingEnvironment": ""
+    },
+    "tags": {
+      "service": "appserviceplan",
+      "application": "[parameters('appName')]",
+      "environment": "[variables('environment')]",
+      "stage": "[variables('stage')]",
+      "location": "[variables('location')]",
+      "createdBy": "Azure Pipeline via ARM"
+    }
+  },
+  {
+    "type": "Microsoft.Web/sites",
+    "name": "[parameters('appName')]",
+    "apiVersion": "2020-12-01",
+    "location": "[resourceGroup().location]",
+    "tags": {
+      "service": "appservice",
+      "application": "[parameters('appName')]",
+      "environment": "[variables('environment')]",
+      "stage": "[variables('stage')]",
+      "location": "[variables('location')]",
+      "createdBy": "Azure Pipeline via ARM"
+    },
+    "properties": {
+      "name": "[parameters('appName')]",
+      "siteConfig": {
+        "appSettings": [
+          {
+            "name": "DOCKER_REGISTRY_SERVER_URL",
+            "value": "[concat(
+            'https://', reference(concat('Microsoft.ContainerRegistry/registries/', parameters('acrEnvironment'), parameters('acrStage'))).loginServer)]"
+          },
+          {
+            "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+            "value": "[listCredentials(
+              concat('Microsoft.ContainerRegistry/registries/', parameters('acrEnvironment'), parameters('acrStage')), '2017-10-01').username]"
+          },
+          {
+            "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+            "value": "[listCredentials(
+              concat('Microsoft.ContainerRegistry/registries/', parameters('acrEnvironment'), parameters('acrStage')), '2017-10-01').passwords[0].value]"
+          },
+          {
+            "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+            "value": "false"
+          }
+        ],
+        "appCommandLine": "[concat('./', parameters('appName'))]",
+        "linuxFxVersion": "[concat('DOCKER|', reference(concat('Microsoft.ContainerRegistry/registries/', parameters('acrEnvironment'), parameters('acrStage'))).loginServer, '/', parameters('appName'))]"
+      },
+      "serverFarmId": "[concat(variables('environment'), '-', variables('stage'), '-', parameters('appName'), '-serviceplan')]",
+      "hostingEnvironment": "",
+      "tags": {
+        "service": "application",
+        "application": "[parameters('appName')]",
+        "environment": "[variables('environment')]",
+        "stage": "[variables('stage')]",
+        "location": "[variables('location')]",
+        "createdBy": "Azure Pipeline via ARM"
+      }
+    },
+    "dependsOn": [
+      "[concat('Microsoft.Web/serverfarms/', concat(variables('environment'), '-', variables('stage'), '-', parameters('appName'), '-serviceplan'))]",
+      "[concat('Microsoft.ContainerRegistry/registries/', parameters('acrEnvironment'), parameters('acrStage'))]"
+    ]
+  }
+  ]
+}

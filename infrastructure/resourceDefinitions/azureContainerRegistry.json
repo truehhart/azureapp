@@ -1,65 +1,33 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "environmentParams": {
-      "type": "object",
-      "metadata": {
-        "description": "Global Environment Parameters"
-      }
-    }
-  },
-  "variables": {},
-  "functions": [],
-  "resources": [
-    {
-      "name": "[concat(parameters('environmentParams').environment, parameters('environmentParams').stage, 'ContainerRegistry-deployment')]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2021-04-01",
-      "resourceGroup": "[concat(parameters('environmentParams').environment, '-', parameters('environmentParams').stage, '-rg')]",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "outer"
-        },
-        "mode": "Incremental",
-        "parameters": {},
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "parameters": {},
-          "variables": {},
-          "resources": [
-            {
-              "name": "[concat(parameters('environmentParams').environment, parameters('environmentParams').stage, 'ContainerRegistry')]",
-              "type": "Microsoft.ContainerRegistry/registries",
-              "apiVersion": "2019-05-01",
-              "location": "[parameters('environmentParams').az.location]",
-              "sku": {
-                "name": "[parameters('environmentParams').containerRegistry.sku]"
-              },
-              "properties": {
-                "adminUserEnabled": false
-              },
-              "tags": {
-                "environment": "[parameters('environmentParams').environment]",
-                "stage": "[parameters('environmentParams').stage]",
-                "createdBy": "Azure Resource Manager Template"
-              }
-            }
-          ],
-          "outputs": {}
-        }
-      }
-    }
-  ],
-  "outputs": {
-    "subscriptionName": {
-      "type": "string",
-      "value": "[subscription().displayName]"
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {
+      "environment": "[resourceGroup().tags.environment]",
+      "stage":       "[resourceGroup().tags.stage]",
+      "location":    "[resourceGroup().location]"
     },
-    "subscriptionId": {
-      "type": "string",
-      "value": "[subscription().subscriptionId]"
-    }
-  }
+    "parameters": {
+      "sku": {"type": "string", "metadata": {"description": "SKU For the ACR"}, "defaultValue": "Basic"}
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ContainerRegistry/registries",
+            "sku": {
+                "name": "[parameters('sku')]"
+            },
+            "name": "[concat(variables('environment'), variables('stage'), 'acr')]",
+            "apiVersion": "2017-10-01",
+            "location": "[variables('location')]",
+            "properties": {
+                "adminUserEnabled": true
+            },
+            "tags": {
+              "service": "containerregistry",
+              "environment": "[variables('environment')]",
+              "stage": "[variables('stage')]",
+              "location": "[variables('location')]",
+              "createdBy": "Azure Pipeline via ARM"
+          }
+        }
+    ]
 }

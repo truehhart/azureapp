@@ -1,0 +1,33 @@
+resources:
+  pipelines:
+  - pipeline: 'run-staging-deployment'
+    source: 'build-azureapp-on-changes'
+    trigger: true
+
+variables:
+  revision:
+  # vmImage: 'ubuntu-latest' 
+  # We use a 'shared' management environment to host docker containers.
+  # This would ensure that production would get the same image that was tested on staging
+  environment:  'staging'
+  stage:        'truehhart'
+  appName:      'azureapp'
+  subscription: 'main'
+  acrName:      'managementtruehhartContainerRegistry'
+
+# New Azure Accounts don't allow to use hosted compute resources.
+# So I just set up a localhost agent for testing
+# Otherwise:
+# pool:
+#   vmImage: $(vmImage)
+pool: localhost
+
+stages:
+  - task: AzureContainerAppsRC@0 
+    inputs: 
+      azureSubscription: '$(subscription)'
+      acrName: '$(acrName)'
+      containerAppName: '$(appName)'
+      resourceGroup: '$(environment)-$(stage)-rg'
+      imageToDeploy: 'myregistry.azurecr.io/my-container-app:$(Build.BuildId)'
+      containerRegistry: 

@@ -1,35 +1,26 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "environmentParams": {
-      "type": "object",
-      "metadata": {
-        "description": "Global Environment Parameters"
-      }
-    }
-  },
-  "functions": [],
-  "resources": [{
-    "name": "[concat(parameters('environmentParams').environment, '-', parameters('environmentParams').stage, '-rg')]",
-    "type": "Microsoft.Resources/resourceGroups",
-    "apiVersion": "2021-04-01",
-    "location": "[parameters('environmentParams').az.location]",
-    "dependsOn": [],
-    "tags": {
-      "environment": "[parameters('environmentParams').environment]",
-      "stage": "[parameters('environmentParams').stage]",
-      "createdBy": "Azure Resource Manager Template"
-    }
-  }],
-  "outputs": {
-    "subscriptionName": {
-      "type": "string",
-      "value": "[subscription().displayName]"
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "environment": {"type": "string", "metadata": {"description": "Azure Deployment Environment"}},
+      "stage": {"type": "string", "metadata": {"description": "Azure Deployment Stage"}},
+      "location": {"type": "string", "metadata": {"description": "Azure Deployment Location"}, "defaultValue": "westeurope"}
+      
     },
-    "subscriptionId": {
-      "type": "string",
-      "value": "[subscription().subscriptionId]"
-    }
-  }
+    "resources": [
+      {
+          "name": "[concat(parameters('environment'), '-', parameters('stage'), '-rg')]",
+          "type": "Microsoft.Resources/resourceGroups",
+          "apiVersion": "2021-04-01",
+          "location": "[parameters('location')]",
+          "dependsOn": [],
+          "tags": {
+            "service": "resourcegroup",
+            "environment": "[parameters('environment')]",
+            "stage": "[parameters('stage')]",
+            "location": "[parameters('location')]",
+            "createdBy": "Azure Pipeline via ARM"
+          }
+      }
+    ]
 }

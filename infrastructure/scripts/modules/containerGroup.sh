@@ -15,7 +15,7 @@ done
 scriptPath=$(dirname "$(realpath $0)")
 configurationFilesPath="$scriptPath/../../configuration/global"
 resourceDefinitionsPath="$scriptPath/../../resourceDefinitions"
-moduleName="ContainerRegistry"
+moduleName="ContainerGroup"
 resourceDefinitionName="azure$moduleName"
 
 dependancies=("$scriptPath/../utility/cfgValidator.sh")
