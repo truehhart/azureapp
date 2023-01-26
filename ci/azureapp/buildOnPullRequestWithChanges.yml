@@ -35,15 +35,16 @@ stages:
         displayName: Build an image
         inputs:
           command: build
-          repository: '$(environment)$(stage)containerregistry.azurecr.io/$(Build.Repository.Name)'
+          repository: '$(Build.Repository.Name)'
           Dockerfile: 'build/dockerfiles/$(appName).Dockerfile'
           buildContext: '$(Build.Repository.LocalPath)'
+          containerRegistry: '$(environment)$(stage)ContainerRegistry'
           tags: '$(Build.BuildId).$(revision)'
       - task: Docker@2
         displayName: Push an image to container registry
         inputs:
           command: push
-          repository: '$(environment)$(stage)containerregistry.azurecr.io/$(Build.Repository.Name)'
+          repository: '$(Build.Repository.Name)'
           buildContext: '$(Build.Repository.LocalPath)'
           containerRegistry: '$(environment)$(stage)ContainerRegistry'
           tags: '$(Build.BuildId).$(revision)'
