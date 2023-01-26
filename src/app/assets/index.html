@@ -41,7 +41,10 @@
       fetch(currenturl + 'helloworld')
         .then(res => res.json())
         .then(data =>
-          resultDiv.innerHTML = "Result: " + data.output
+          resultDiv.innerHTML = "Results:"
+            + "</br>environment - " + data.environment 
+            + "</br>revision - " + data.revision
+            + "</br>return_message - " + data.message
         )
         .catch(err => {throw err});
   }

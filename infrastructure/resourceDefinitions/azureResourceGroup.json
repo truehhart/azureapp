@@ -11,14 +11,14 @@
   },
   "functions": [],
   "resources": [{
-    "name": "[concat(parameters('environmentParams')['environment'], '-', parameters('environmentParams')['stage'], '-rg')]",
+    "name": "[concat(parameters('environmentParams').environment, '-', parameters('environmentParams').stage, '-rg')]",
     "type": "Microsoft.Resources/resourceGroups",
     "apiVersion": "2021-04-01",
-    "location": "[parameters('environmentParams')['azLocation']]",
+    "location": "[parameters('environmentParams').azLocation]",
     "dependsOn": [],
     "tags": {
-      "environment": "[parameters('environmentParams')['environment']]",
-      "stage": "[parameters('environmentParams')['stage']]",
+      "environment": "[parameters('environmentParams').environment]",
+      "stage": "[parameters('environmentParams').stage]",
       "createdBy": "Azure Resource Manager Template"
     }
   }],

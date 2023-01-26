@@ -17,14 +17,13 @@ func Router() *mux.Router {
 
 	router.PathPrefix("/assets/").Handler(staticFileHandler).Methods("GET")
 
-	messageToReturn, _ := os.LookupEnv("APP_RETURN_MESSAGE")
+	messageToReturn := map[string]string{
+		"environment": handlers.ReturnEnv(os.LookupEnv("APP_ENVIRONMENT")),
+		"message": handlers.ReturnEnv(os.LookupEnv("APP_MESSAGE")),
+		"revision": handlers.ReturnEnv(os.LookupEnv("APP_REVISION")),
+	}
 	router.HandleFunc("/helloworld", handlers.ReturnMessage(messageToReturn)).Methods("GET")
 	router.PathPrefix("/index.html").Handler(staticFileHandler).Methods("GET")
 
 	return router
 }
-
-// func notFound(w http.ResponseWriter, r *http.Request) {
-// 	http.ServeFile(w, r, defaultRoute)
-// 	http.Redirect(w, r, )
-// }

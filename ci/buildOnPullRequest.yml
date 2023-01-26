@@ -1,0 +1,53 @@
+# pr:
+#   branches:
+#     include: ['feature/*']
+#   paths:
+#     include: ['src']
+#     exclude: ['src/LICENSE']
+trigger:
+  - none
+
+variables:
+  vmImage: 'ubuntu-latest' 
+  revision: 
+
+parameters:
+  - name: 'environment'
+    displayName: 'Environment'
+    type: 'string'
+  - name: 'stage'
+    displayName: 'Stage'
+    type: 'string'
+  - name: 'repo'
+    displayName: 'Repository'
+    type: 'string'
+  - name: 'appName'
+    displayName: 'Application Name'
+    type: 'string'
+
+# New Azure Accounts don't allow to use hosted compute resources.
+# So I just set up a localhost agent for testing
+# Otherwise:
+# pool:
+#   vmImage: $(vmImage)
+pool: localhost
+
+stages:
+  - stage: Build
+    displayName: Build and push stage
+    jobs:
+    - job: Build
+      displayName: Build
+      steps:
+      - task: CmdLine@2
+        inputs:
+          script: ' x=`echo "$(Build.SourceVersion)" | head -c 7`; echo "##vso[task.setvariable variable=revision]$x"'
+      - task: Docker@2
+        displayName: Build and push an image to container registry
+        inputs:
+          command: buildAndPush
+          repository: ${{ parameters.repo }}
+          Dockerfile: 'build/dockerfiles/${{ parameters.appName }}.Dockerfile'
+          # You would need to manually create this 
+          containerRegistry: '${{ parameters.environment }}${{ parameters.stage }}ContainerRegistry'
+          tags: '$(Build.BuildId).$(revision)'

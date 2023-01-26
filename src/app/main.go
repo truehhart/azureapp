@@ -13,7 +13,9 @@ func main() {
 	// Quick check for necessary environment variables.
 	reqEnvironmentVars := []string{
 		"HTTP_LISTEN_PORT",
-		"APP_RETURN_MESSAGE",
+		"APP_MESSAGE",
+		"APP_ENVIRONMENT",
+		"APP_REVISION",
 	}
 	for _, variable := range reqEnvironmentVars {
 		_, present := os.LookupEnv(variable)

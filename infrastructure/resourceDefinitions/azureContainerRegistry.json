@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "environmentParams": {
@@ -9,31 +9,46 @@
       }
     }
   },
+  "variables": {},
   "functions": [],
   "resources": [
     {
-      "name": "[concat(parameters('environmentParams')['environment'], parameters('environmentParams')['stage'], 'ContainerRegistry')]",
-      "type": "Microsoft.ContainerRegistry/registries",
-      "apiVersion": "2019-05-01",
-      "location": "[resourceGroup().location]",
-      "sku": {
-        "name": "[parameters('environmentParams')['containerRegistry']['sku']]"
-      },
+      "name": "[concat(parameters('environmentParams').environment, parameters('environmentParams').stage, 'ContainerRegistry-deployment')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "resourceGroup": "[concat(parameters('environmentParams').environment, '-', parameters('environmentParams').stage, '-rg')]",
       "properties": {
-        "adminUserEnabled": false
-        // "policies": {
-        //   "trustPolicy": {
-        //     "status": "enabled"
-        //   }
-        // },
-        // "networkRuleSet": {
-        //   "defaultAction": "Deny"
-        // }
-      },
-      "tags": {
-        "environment": "[parameters('environmentParams')['environment']]",
-        "stage": "[parameters('environmentParams')['stage']]",
-        "createdBy": "Azure Resource Manager Template"
+        "expressionEvaluationOptions": {
+          "scope": "outer"
+        },
+        "mode": "Incremental",
+        "parameters": {},
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {},
+          "variables": {},
+          "resources": [
+            {
+              "name": "[concat(parameters('environmentParams').environment, parameters('environmentParams').stage, 'ContainerRegistry')]",
+              "type": "Microsoft.ContainerRegistry/registries",
+              "apiVersion": "2019-05-01",
+              "location": "[parameters('environmentParams').azLocation]",
+              "sku": {
+                "name": "[parameters('environmentParams').containerRegistry.sku]"
+              },
+              "properties": {
+                "adminUserEnabled": false
+              },
+              "tags": {
+                "environment": "[parameters('environmentParams').environment]",
+                "stage": "[parameters('environmentParams').stage]",
+                "createdBy": "Azure Resource Manager Template"
+              }
+            }
+          ],
+          "outputs": {}
+        }
       }
     }
   ],

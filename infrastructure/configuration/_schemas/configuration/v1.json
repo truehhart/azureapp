@@ -8,7 +8,6 @@
   ],
   "properties": {
     "schema": {
-      "$id": "#/properties/schema",
       "type": "string",
       "title": "Schema Version Identifier",
       "default": "",
@@ -18,7 +17,6 @@
       ]
     },
     "params": {
-      "$id": "#/properties/params",
       "type": "object",
       "title": "Parameters Object",
       "default": {},

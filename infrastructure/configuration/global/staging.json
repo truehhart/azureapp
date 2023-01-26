@@ -2,11 +2,13 @@
   "schema": "configuration/v1",
   "params": {
     "environmentParams": {
-      "environment":  "staging",
-      "stage": "truehhart",
-      "azLocation": "westeurope",
-      "containerRegistry": {
-        "sku": "Basic"
+      "value": {
+        "environment": "staging", 
+        "stage": "truehhart", 
+        "azLocation": "westeurope", 
+        "containerRegistry": {
+            "sku": "Basic"
+        }
       }
     }
   }
