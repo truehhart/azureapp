@@ -45,9 +45,15 @@ stages:
       - task: Docker@2
         displayName: Build and push an image to container registry
         inputs:
-          command: buildAndPush
+          command: build
           repository: ${{ parameters.repo }}
           Dockerfile: 'build/dockerfiles/${{ parameters.appName }}.Dockerfile'
+          buildContext: '$(Build.Repository.LocalPath)'
+          tags: '$(Build.BuildId).$(revision)'
+      - task: Docker@2
+        displayName: Build and push an image to container registry
+        inputs:
+          command: push
           buildContext: '$(Build.Repository.LocalPath)'
           containerRegistry: '${{ parameters.environment }}${{ parameters.stage }}ContainerRegistry'
           tags: '$(Build.BuildId).$(revision)'
