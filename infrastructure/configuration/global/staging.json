@@ -12,9 +12,6 @@
             "site": "dparshenkov",
             "project": "azureapp"
           }
-        },
-        "containerRegistry": {
-            "sku": "Basic"
         }
       }
     }

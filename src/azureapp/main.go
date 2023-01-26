@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/truehhart/azureapp/src/app/routes"
+	"github.com/truehhart/azureapp/src/azureapp/routes"
 )
 
 func main() {

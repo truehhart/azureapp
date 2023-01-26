@@ -1,0 +1,47 @@
+pr:
+  branches:
+    include: ['feature/*']
+  paths:
+    include: ['src/azureapp/']
+
+variables:
+  revision:
+  # vmImage: 'ubuntu-latest' 
+  # We use a 'shared' management environment to host docker containers.
+  # This would ensure that production would get the same image that was tested on staging
+  environment: 'management'
+  stage:       'truehhart'
+  appName:     'azureapp'
+
+# New Azure Accounts don't allow to use hosted compute resources.
+# So I just set up a localhost agent for testing
+# Otherwise:
+# pool:
+#   vmImage: $(vmImage)
+pool: localhost
+
+stages:
+  - stage: Build
+    displayName: Build and push stage
+    jobs:
+    - job: Build
+      displayName: Build
+      steps:
+      - task: CmdLine@2
+        inputs:
+          script: ' x=`echo "$(Build.SourceVersion)" | head -c 7`; echo "##vso[task.setvariable variable=revision]$x"'
+      - task: Docker@2
+        displayName: Build an image
+        inputs:
+          command: build
+          repository: '$(Build.Repository.Name)'
+          Dockerfile: 'build/dockerfiles/$(appName).Dockerfile'
+          buildContext: '$(Build.Repository.LocalPath)'
+          tags: '$(Build.BuildId).$(revision)'
+      - task: Docker@2
+        displayName: Push an image to container registry
+        inputs:
+          command: push
+          buildContext: '$(Build.Repository.LocalPath)'
+          containerRegistry: '$(environment)$(stage)ContainerRegistry'
+          tags: '$(Build.BuildId).$(revision)'

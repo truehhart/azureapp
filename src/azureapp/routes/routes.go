@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	"github.com/truehhart/azureapp/src/app/handlers"
+	"github.com/truehhart/azureapp/src/azureapp/handlers"
 )
 
 

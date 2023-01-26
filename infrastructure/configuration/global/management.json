@@ -3,15 +3,14 @@
   "params": {
     "environmentParams": {
       "value": {
-        "environment": "prod",
+        "environment": "management",
         "stage": "truehhart",
         "az": {
           "location": "westeurope",
-          "subscriptionName": "main",
-          "devOps": {
-            "site": "dparshenkov",
-            "project": "azureapp"
-          }
+          "subscriptionName": "main"
+        },
+        "containerRegistry": {
+            "sku": "Basic"
         }
       }
     }
