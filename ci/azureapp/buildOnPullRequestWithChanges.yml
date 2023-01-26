@@ -28,6 +28,7 @@ stages:
       displayName: Build
       steps:
       - task: CmdLine@2
+        displayName: Set build revision
         inputs:
           script: ' x=`echo "$(Build.SourceVersion)" | head -c 7`; echo "##vso[task.setvariable variable=revision]$x"'
       - task: Docker@2
@@ -37,12 +38,12 @@ stages:
           repository: '$(Build.Repository.Name)'
           Dockerfile: 'build/dockerfiles/$(appName).Dockerfile'
           buildContext: '$(Build.Repository.LocalPath)'
-          containerRegistry: '$(environment)$(stage)ContainerRegistry'
           tags: '$(Build.BuildId).$(revision)'
       - task: Docker@2
         displayName: Push an image to container registry
         inputs:
           command: push
+          repository: '$(Build.Repository.Name)'
           buildContext: '$(Build.Repository.LocalPath)'
           containerRegistry: '$(environment)$(stage)ContainerRegistry'
           tags: '$(Build.BuildId).$(revision)'
