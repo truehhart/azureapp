@@ -21,6 +21,7 @@ stages:
       - task: AzureResourceGroupDeployment@2
         displayName: '[Azure] Deploy ResourceGroup'
         inputs:
+          ConnectedServiceName: '$(subscriptionName)-sc'
           azureSubscription: '$(subscriptionName)'
           resourceGroupName: '$(environment)-$(stage)-rg'
           location: '$(location)'
@@ -30,6 +31,7 @@ stages:
       - task: AzureResourceGroupDeployment@2
         displayName: '[Azure] Deploy ContainerRegistry'
         inputs:
+          ConnectedServiceName: '$(subscriptionName)-sc'
           azureSubscription: '$(subscriptionName)'
           resourceGroupName: '$(environment)-$(stage)-rg'
           location: '$(location)'
