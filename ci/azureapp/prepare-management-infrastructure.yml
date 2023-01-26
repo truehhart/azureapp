@@ -18,14 +18,15 @@ stages:
   - job: 'deploy_azure_resources'
     pool: localhost
     steps:
-      - task: AzureResourceGroupDeployment@2
+      - task: AzureResourceManagerTemplateDeployment@2
         displayName: '[Azure] Deploy ResourceGroup'
         inputs:
-          ConnectedServiceName: '$(subscriptionName)-sc'
-          azureSubscription: '$(subscriptionName)'
-          resourceGroupName: '$(environment)-$(stage)-rg'
-          location: '$(location)'
+          deploymentScope: 'Subscription'
+          subscriptionName: '$(subscriptionName)'
+          templateLocation: 'Linked artifact'
           csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
+          ConnectedServiceName: '$(subscriptionName)-sc'
+          location: '$(location)'
           overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
 
       - task: AzureResourceGroupDeployment@2
