@@ -13,9 +13,9 @@ variables:
   location: 'westeurope'
 
 stages:
-- stage: 'PrepareInfrastructure'
+- stage: 'prepare_infrastructure'
   jobs: 
-  - job: 'Deploy Azure Resources'
+  - job: 'deploy_azure_resources'
     pool: localhost
     steps:
       - task: AzureResourceGroupDeployment@2
