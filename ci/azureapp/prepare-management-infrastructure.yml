@@ -18,7 +18,7 @@ stages:
   - job: 'deploy_azure_resources'
     pool: localhost
     steps:
-      - task: AzureResourceManagerTemplateDeployment@2
+      - task: AzureResourceManagerTemplateDeployment@3
         displayName: '[Azure] Deploy ResourceGroup'
         inputs:
           deploymentScope: 'Subscription'
