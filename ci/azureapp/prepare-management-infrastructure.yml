@@ -22,7 +22,7 @@ stages:
         displayName: '[Azure] Deploy ResourceGroup'
         inputs:
           deploymentScope: 'Subscription'
-          subscriptionName: '$(subscriptionName)'
+          subscriptionName: '$(subscriptionName)-sc'
           templateLocation: 'Linked artifact'
           csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
           ConnectedServiceName: '$(subscriptionName)-sc'
