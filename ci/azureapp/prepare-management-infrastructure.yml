@@ -15,20 +15,23 @@ variables:
 stages:
 - stage: 'Prepare Infrastructure'
   jobs: 
-    - job: AzureResourceGroupDeployment@2
-      displayName: '[Azure] Deploy ResourceGroup'
-      inputs:
-        azureSubscription: '$(subscriptionName)'
-        resourceGroupName: '$(environment)-$(stage)-rg'
-        location: '$(location)'
-        csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
-        overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
+  - job: 'Deploy Azure Resources'
+    pool: localhost
+    steps:
+      - task: AzureResourceGroupDeployment@2
+        displayName: '[Azure] Deploy ResourceGroup'
+        inputs:
+          azureSubscription: '$(subscriptionName)'
+          resourceGroupName: '$(environment)-$(stage)-rg'
+          location: '$(location)'
+          csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
+          overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
 
-    - job: AzureResourceGroupDeployment@2
-      displayName: '[Azure] Deploy ContainerRegistry'
-      inputs:
-        azureSubscription: '$(subscriptionName)'
-        resourceGroupName: '$(environment)-$(stage)-rg'
-        location: '$(location)'
-        csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
-        overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
+      - task: AzureResourceGroupDeployment@2
+        displayName: '[Azure] Deploy ContainerRegistry'
+        inputs:
+          azureSubscription: '$(subscriptionName)'
+          resourceGroupName: '$(environment)-$(stage)-rg'
+          location: '$(location)'
+          csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
+          overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
