@@ -1,11 +1,11 @@
 FROM golang:1.19-alpine
 
 WORKDIR /build
-COPY src/app/ /build/
+ADD ./src/app/ /build/
+ADD ./src/app/assets /output/assets
 
 RUN go mod download \
-    && go build -o /output/app \
-    && cp -r /build/assets /output/assets
+    && go build -o /output/app
 
 FROM alpine:latest
 
