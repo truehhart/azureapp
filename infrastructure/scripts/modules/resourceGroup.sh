@@ -37,7 +37,7 @@ params=$(cat "$environmentConfigurationFile" | jq -c .params)
 # Resource-specific deployment configuration
 az deployment sub create \
   --name "$(echo $params | jq -r .environmentParams.value.environment)-$moduleName" \
-  --location "$(echo $params | jq -r .environmentParams.value.azLocation)" \
+  --location "$(echo $params | jq -r .environmentParams.value.az.location)" \
   --parameters $params \
   --template-file "$resourceDefinitionsPath/$resourceDefinitionName.json" \
   $askWhatIf

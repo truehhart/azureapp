@@ -48,6 +48,5 @@ stages:
           command: buildAndPush
           repository: ${{ parameters.repo }}
           Dockerfile: 'build/dockerfiles/${{ parameters.appName }}.Dockerfile'
-          # You would need to manually create this 
           containerRegistry: '${{ parameters.environment }}${{ parameters.stage }}ContainerRegistry'
           tags: '$(Build.BuildId).$(revision)'

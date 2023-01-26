@@ -14,7 +14,7 @@
     "name": "[concat(parameters('environmentParams').environment, '-', parameters('environmentParams').stage, '-rg')]",
     "type": "Microsoft.Resources/resourceGroups",
     "apiVersion": "2021-04-01",
-    "location": "[parameters('environmentParams').azLocation]",
+    "location": "[parameters('environmentParams').az.location]",
     "dependsOn": [],
     "tags": {
       "environment": "[parameters('environmentParams').environment]",

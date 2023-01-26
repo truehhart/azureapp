@@ -33,7 +33,7 @@
               "name": "[concat(parameters('environmentParams').environment, parameters('environmentParams').stage, 'ContainerRegistry')]",
               "type": "Microsoft.ContainerRegistry/registries",
               "apiVersion": "2019-05-01",
-              "location": "[parameters('environmentParams').azLocation]",
+              "location": "[parameters('environmentParams').az.location]",
               "sku": {
                 "name": "[parameters('environmentParams').containerRegistry.sku]"
               },

@@ -3,9 +3,16 @@
   "params": {
     "environmentParams": {
       "value": {
-        "environment": "staging", 
-        "stage": "truehhart", 
-        "azLocation": "westeurope", 
+        "environment": "staging",
+        "stage": "truehhart",
+        "az": {
+          "location": "westeurope",
+          "subscriptionName": "main",
+          "devOps": {
+            "site": "dparshenkov",
+            "project": "azureapp"
+          }
+        },
         "containerRegistry": {
             "sku": "Basic"
         }
