@@ -13,7 +13,7 @@ variables:
   location: 'westeurope'
 
 stages:
-- stage: 'Prepare Infrastructure'
+- stage: 'PrepareInfrastructure'
   jobs: 
   - job: 'Deploy Azure Resources'
     pool: localhost
