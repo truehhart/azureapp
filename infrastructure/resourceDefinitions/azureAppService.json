@@ -72,8 +72,8 @@
             "value": "false"
           },
           {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'))), '2017-10-01').InstrumentationKey]"
+            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+            "value": "[reference(resourceId('microsoft.insights/components/', concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'))), '2020-02-02').InstrumentationKey]"
           },
           {
             "name": "WEBSITES_PORT",
