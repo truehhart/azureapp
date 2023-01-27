@@ -22,7 +22,7 @@ stages:
 # We could also sqeeze in the deployment in here, but generally in practice it proved better to split resources logically.
 # As such, I have decided to have CI and CD pipelines to be separate.
 - stage: 'build'
-  displayName: 'Building $(appName)'
+  displayName: 'Building ${{ variables.appName }}'
   jobs:
   - job: 'build_and_push_container'
     pool: 'localhost'
