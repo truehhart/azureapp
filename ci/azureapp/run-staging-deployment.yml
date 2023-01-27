@@ -14,7 +14,7 @@ variables:
   environment:  'staging'
   stage:        'truehhart'
   appName:      'azureapp'
-  subscription: 'main'
+  subscriptionName: 'main'
 
 stages:
 - stage: 'deploy_to_staging'
