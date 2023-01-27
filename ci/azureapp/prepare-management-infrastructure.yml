@@ -40,3 +40,4 @@ stages:
           ConnectedServiceName: '$(subscriptionName)-sc'
           resourceGroupName: '$(environment)-$(stage)-rg'
           location: '$(location)'
+          overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
