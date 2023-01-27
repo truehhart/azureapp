@@ -22,19 +22,19 @@ stages:
         displayName: '[Azure] Deploy ResourceGroup'
         inputs:
           deploymentScope: 'Subscription'
-          subscriptionName: '$(subscriptionName)-sc'
           templateLocation: 'Linked artifact'
           csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
           ConnectedServiceName: '$(subscriptionName)-sc'
           location: '$(location)'
           overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
 
-      - task: AzureResourceGroupDeployment@2
+      - task: AzureResourceManagerTemplateDeployment@3
         displayName: '[Azure] Deploy ContainerRegistry'
         inputs:
+          deploymentScope: 'ResourceGroup'
+          templateLocation: 'Linked artifact'
+          csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
           ConnectedServiceName: '$(subscriptionName)-sc'
           azureSubscription: '$(subscriptionName)'
           resourceGroupName: '$(environment)-$(stage)-rg'
           location: '$(location)'
-          csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
-          overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
