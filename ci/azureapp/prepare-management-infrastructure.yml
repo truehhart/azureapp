@@ -1,8 +1,7 @@
-trigger:
-  branches:
-    include: ['feature/*']
-  paths:
-    include: ['src/azureapp/']
+# This job should be run one time only.
+# You could create management environment using az cli like I used to in my previous revisions,
+#   but since AzPipelines allow you to trigger ARM deployments on their end - why not use them instead.
+trigger: ['none']
 
 name: 'prepare-management-infrastructure'
 variables:
@@ -19,12 +18,12 @@ stages:
 # These resources will be reused across the project to host the app that's built.
 - stage: 'prepare_infrastructure'
   displayName: 'Deploying Management Infrastructure'
-  jobs: 
+  jobs:
   - job: 'deploy_azure_resources'
     pool: localhost
     steps:
       - task: AzureResourceManagerTemplateDeployment@3
-        displayName: '[Azure] Deploying ResourceGroup'
+        displayName: '[Azure] Deploying ${{ variables.environment }}-${{ variables.stage }} Resource Group'
         inputs:
           deploymentScope: 'Subscription'
           templateLocation: 'Linked artifact'
@@ -34,7 +33,7 @@ stages:
           overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
 
       - task: AzureResourceManagerTemplateDeployment@3
-        displayName: '[Azure] Deploying ContainerRegistry'
+        displayName: '[Azure] Deploying ${{ variables.environment }}-${{ variables.stage }} ContainerRegistry'
         inputs:
           deploymentScope: 'Resource Group'
           templateLocation: 'Linked artifact'

@@ -1,3 +1,4 @@
+name: 'run-staging-deployment'
 resources:
   pipelines:
   - pipeline: 'run-staging-deployment'
@@ -5,29 +6,68 @@ resources:
     trigger: true
 
 variables:
+  # These variables are set during runtime.
   revision:
-  # vmImage: 'ubuntu-latest' 
-  # We use a 'shared' management environment to host docker containers.
-  # This would ensure that production would get the same image that was tested on staging
+  version:
+  acrEnvironment: 'management'
+  acrStage:       'truehhart'
   environment:  'staging'
   stage:        'truehhart'
   appName:      'azureapp'
   subscription: 'main'
-  acrName:      'managementtruehhartContainerRegistry'
-
-# New Azure Accounts don't allow to use hosted compute resources.
-# So I just set up a localhost agent for testing
-# Otherwise:
-# pool:
-#   vmImage: $(vmImage)
-pool: localhost
 
 stages:
-  - task: AzureContainerAppsRC@0 
-    inputs: 
-      azureSubscription: '$(subscription)'
-      acrName: '$(acrName)'
-      containerAppName: '$(appName)'
-      resourceGroup: '$(environment)-$(stage)-rg'
-      imageToDeploy: 'myregistry.azurecr.io/my-container-app:$(Build.BuildId)'
-      containerRegistry: 
+- stage: 'deploy_to_staging'
+  jobs:
+  - job: 'release_application_to_staging'
+    pool: 'localhost'
+    steps:
+      # Unfortunately, I hasn't found a way for AzPipelines to reliably pass information between pipelines, but still wanted to have them separate.
+      # So we repeat the tasks to get build version from the previous pipeline.
+      - task: CmdLine@2
+        displayName: '[Build] Getting current source version'
+        inputs:
+          workingDirectory: '$(Build.Repository.LocalPath)'
+          script: 'version=`cat ./src/$(appName)/.version`; echo "##vso[task.setvariable variable=version]$version"'
+      - task: CmdLine@2
+        displayName: '[Build] Getting current git revision'
+        inputs:
+          script: 'revision=`echo "$(Build.SourceVersion)" | head -c 7`; echo "##vso[task.setvariable variable=revision]$revision"'
+
+      # First we should provision a resource group for an environment if it doesn't exist yet.
+      - task: AzureResourceManagerTemplateDeployment@3
+        displayName: '[Azure] Deploying ${{ variables.environment }}-${{ variables.stage }} Resource Group'
+        inputs:
+          deploymentScope: 'Subscription'
+          templateLocation: 'Linked artifact'
+          csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
+          ConnectedServiceName: '$(subscriptionName)-sc'
+          location: '$(location)'
+          overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
+
+      # Now we deploy a WebApp to Azure App Service. The ARM template provided also creates the App Service Plan for the application
+      - task: AzureResourceManagerTemplateDeployment@3
+        displayName: '[Azure] Deploying ${{ variables.appName }} App Service to ${{ variables.environment }}-${{ variables.stage }}'
+        inputs:
+          deploymentScope: 'Resource Group'
+          templateLocation: 'Linked artifact'
+          csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureAppService.json'
+          ConnectedServiceName: '$(subscriptionName)-sc'
+          resourceGroupName: '$(environment)-$(stage)-rg'
+          location: '$(location)'
+          overrideParameters: '-appName $(appName) -acrEnvironment $(acrEnvironment) -acrStage $(acrStage)'
+
+    # # Deploy App Service
+    # - task: AzureRmWebAppDeployment@3
+    #   displayName: 'Deploy Azure App Service'
+    #   inputs:
+    #     azureSubscription: 'AzureSC'
+    #     appType: applinux
+    #     WebAppName: $(webAppName)
+    #     DockerNamespace: $(acrHostName)
+    #     DockerRepository: $(webAppName)
+    #     DockerImageTag: '$(Build.BuildId)'
+    #     WebAppUri: webAppUrl
+    #     TakeAppOfflineFlag: true
+    #     UseWebDeploy: true
+    #     RenameFilesFlag: true
