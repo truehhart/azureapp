@@ -31,9 +31,9 @@ stages:
       - task: AzureResourceManagerTemplateDeployment@3
         displayName: '[Azure] Deploy ContainerRegistry'
         inputs:
-          deploymentScope: 'ResourceGroup'
+          deploymentScope: 'Resource Group'
           templateLocation: 'Linked artifact'
-          csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
+          csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureContainerRegistry.json'
           ConnectedServiceName: '$(subscriptionName)-sc'
           resourceGroupName: '$(environment)-$(stage)-rg'
           location: '$(location)'
