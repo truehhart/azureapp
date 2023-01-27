@@ -19,13 +19,13 @@
       "name": "[split(parameters('servicePlanSku'), ' ')[1]]",
       "tier": "[split(parameters('servicePlanSku'), ' ')[0]]"
     },
-    "kind": "linux",
+    "kind": "app,linux",
     "apiVersion": "2020-12-01",
     "location": "[parameters('location')]",
     "properties": {
       "name": "[concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'), '-serviceplan')]",
       "workerSizeId": "0",
-      "reserved": false,
+      "reserved": true,
       "numberOfWorkers": "1",
       "hostingEnvironment": ""
     },
@@ -50,7 +50,6 @@
       "stage": "[parameters('stage')]",
       "location": "[parameters('location')]",
       "createdBy": "Azure Pipeline via ARM"
-
     },
     "properties": {
       "name": "[concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'))]",
@@ -69,10 +68,6 @@
             "value": "[listCredentials(resourceId(subscription().subscriptionId, concat(parameters('acrEnvironment'), '-', parameters('acrStage'), '-rg'), 'Microsoft.ContainerRegistry/registries', concat(parameters('acrEnvironment'), parameters('acrStage'), 'acr')), '2017-10-01').passwords[0].value]"
           },
           {
-            "name": "DOCKER_CUSTOM_IMAGE_NAME",
-            "value": "[concat(reference(resourceId(subscription().subscriptionId, concat(parameters('acrEnvironment'), '-', parameters('acrStage'), '-rg'), 'Microsoft.ContainerRegistry/registries', concat(parameters('acrEnvironment'), parameters('acrStage'), 'acr')), '2021-09-01').loginServer, '/', parameters('appName'))]"
-          },
-          {
             "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
             "value": "false"
           },
@@ -81,7 +76,8 @@
             "value": "8080"
           }
         ],
-        "appCommandLine": "[concat('./', parameters('appName'))]"
+        "appCommandLine": "[concat('./', parameters('appName'))]",
+        "linuxFxVersion": "[concat('DOCKER|', reference(resourceId(subscription().subscriptionId, concat(parameters('acrEnvironment'), '-', parameters('acrStage'), '-rg'), 'Microsoft.ContainerRegistry/registries', concat(parameters('acrEnvironment'), parameters('acrStage'), 'acr')), '2021-09-01').loginServer, '/', parameters('appName'))]"
       },
       "serverFarmId": "[concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'), '-serviceplan')]",
       "hostingEnvironment": "",

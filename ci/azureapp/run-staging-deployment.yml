@@ -50,13 +50,13 @@ stages:
 
       # Deploy App Service
       - task: AzureRmWebAppDeployment@3
-        displayName: 'test'
+        displayName: '[Deploy] Deploying $(appName) to $(environment)-$(stage)'
         inputs:
           ConnectedServiceName: '$(subscriptionName)-sc'
-          appType: applinux
-          WebAppName: $(appName)
-          DockerNamespace: $(environment)$(stage)acr.azurecr.io
-          DockerRepository: $(Build.Repository.Name)
+          appType: 'applinux'
+          WebAppName: '$(environment)-$(stage)-$(appName)'
+          DockerNamespace: '$(environment)$(stage)acr.azurecr.io'
+          DockerRepository: '$(Build.Repository.Name)'
           DockerImageTag: '$(version).$(revision)'
           WebAppUri: webAppUrl
           TakeAppOfflineFlag: true
