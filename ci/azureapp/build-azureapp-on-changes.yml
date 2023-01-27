@@ -7,19 +7,11 @@ trigger:
 name: 'build-azureapp-on-changes'
 variables:
   revision:
-  # vmImage: 'ubuntu-latest' 
   # We use a 'shared' management environment to host docker containers.
   # This would ensure that production would get the same image that was tested on staging
   environment: 'management'
   stage:       'truehhart'
   appName:     'azureapp'
-
-# New Azure Accounts don't allow to use hosted compute resources.
-# So I just set up a localhost agent for testing
-# Otherwise:
-# pool:
-#   vmImage: $(vmImage)
-pool: localhost
 
 stages:
 # This stage is focused around building the application.
