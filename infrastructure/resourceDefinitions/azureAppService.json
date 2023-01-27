@@ -75,7 +75,7 @@
             "value": "false"
           }
         ],
-        "appCommandLine": "[concat('./', parameters('appName'))]",
+        "appCommandLine": "[concat('/bin/sh', ' ', parameters('appName'))]",
         "linuxFxVersion": "[concat('DOCKER|', reference(concat('Microsoft.ContainerRegistry/registries/', parameters('acrEnvironment'), parameters('acrStage'))).loginServer, '/', parameters('appName'))]"
       },
       "serverFarmId": "[concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'), '-serviceplan')]",
