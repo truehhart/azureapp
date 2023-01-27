@@ -36,15 +36,14 @@ stages:
           script: 'revision=`echo "$(Build.SourceVersion)" | head -c 7`; echo "##vso[task.setvariable variable=revision]$revision"'
 
       # First we should provision a resource group for an environment if it doesn't exist yet.
-      - task: AzureResourceManagerTemplateDeployment@3
-        displayName: '[Azure] Deploying ${{ variables.environment }}-${{ variables.stage }} Resource Group'
-        inputs:
-          deploymentScope: 'Subscription'
-          templateLocation: 'Linked artifact'
-          csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
-          ConnectedServiceName: '$(subscriptionName)-sc'
-          location: '$(location)'
-          overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
+      # - task: AzureResourceManagerTemplateDeployment@3
+      #   displayName: '[Azure] Deploying ${{ variables.environment }}-${{ variables.stage }} Resource Group'
+      #   inputs:
+      #     deploymentScope: 'Subscription'
+      #     templateLocation: 'Linked artifact'
+      #     csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
+      #     ConnectedServiceName: '$(subscriptionName)-sc'
+      #     overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
 
       # Now we deploy a WebApp to Azure App Service. The ARM template provided also creates the App Service Plan for the application
       - task: AzureResourceManagerTemplateDeployment@3
