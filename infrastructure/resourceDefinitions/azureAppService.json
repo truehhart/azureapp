@@ -9,13 +9,7 @@
     "location": {"type": "string", "metadata": {"description": "Azure Deployment Location"}, "defaultValue": "westeurope"},
     "servicePlanSku": {"type": "string", "metadata": {"description": "SKU For the Service Plan"}, "defaultValue": "Free F1"},
     "acrEnvironment": {"type": "string", "metadata": {"description": "Environment where Azure Container Registry is Deployed"}},
-    "acrStage":       {"type": "string", "metadata": {"description": "Stage where Azure Container Registry is Deployed"}},
-    "parameter1": {
-      "type": "string",
-      "metadata": {
-        "description": "[resourceId(subscription().id)]"
-      }
-    }
+    "acrStage":       {"type": "string", "metadata": {"description": "Stage where Azure Container Registry is Deployed"}}
   },
   "resources": [
   {
