@@ -22,15 +22,6 @@ stages:
   - job: 'deploy_azure_resources'
     pool: localhost
     steps:
-      # - task: AzureResourceManagerTemplateDeployment@3
-      #   displayName: '[Azure] Deploying ${{ variables.environment }}-${{ variables.stage }} Resource Group'
-      #   inputs:
-      #     deploymentScope: 'Subscription'
-      #     templateLocation: 'Linked artifact'
-      #     csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
-      #     ConnectedServiceName: '$(subscriptionName)-sc'
-      #     overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
-
       - task: AzureResourceManagerTemplateDeployment@3
         displayName: '[Azure] Deploying ${{ variables.environment }}-${{ variables.stage }} ContainerRegistry'
         inputs:

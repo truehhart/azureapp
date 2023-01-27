@@ -24,7 +24,7 @@ stages:
   - job: 'release_application_to_staging'
     pool: 'localhost'
     steps:
-      # Unfortunately, I hasn't found a way for AzPipelines to reliably pass information between pipelines, but still wanted to have them separate.
+      # Unfortunately, I hasn't found a way for AzPipelines to reliably pass information between pipelines, but I still wanted to have them separate.
       # So we repeat the tasks to get build version from the previous pipeline.
       - task: CmdLine@2
         displayName: '[Build] Getting current source version'
@@ -35,16 +35,6 @@ stages:
         displayName: '[Build] Getting current git revision'
         inputs:
           script: 'revision=`echo "$(Build.SourceVersion)" | head -c 7`; echo "##vso[task.setvariable variable=revision]$revision"'
-
-      # First we should provision a resource group for an environment if it doesn't exist yet.
-      # - task: AzureResourceManagerTemplateDeployment@3
-      #   displayName: '[Azure] Deploying ${{ variables.environment }}-${{ variables.stage }} Resource Group'
-      #   inputs:
-      #     deploymentScope: 'Subscription'
-      #     templateLocation: 'Linked artifact'
-      #     csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
-      #     ConnectedServiceName: '$(subscriptionName)-sc'
-      #     overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
 
       # Now we deploy a WebApp to Azure App Service. The ARM template provided also creates the App Service Plan for the application
       - task: AzureResourceManagerTemplateDeployment@3
@@ -58,17 +48,18 @@ stages:
           location: '$(location)'
           overrideParameters: '-appName $(appName) -acrEnvironment $(acrEnvironment) -acrStage $(acrStage) -environment "$(environment)" -stage "$(stage)" -location $(location)'
 
-    # # Deploy App Service
-    # - task: AzureRmWebAppDeployment@3
-    #   displayName: 'Deploy Azure App Service'
-    #   inputs:
-    #     azureSubscription: 'AzureSC'
-    #     appType: applinux
-    #     WebAppName: $(webAppName)
-    #     DockerNamespace: $(acrHostName)
-    #     DockerRepository: $(webAppName)
-    #     DockerImageTag: '$(Build.BuildId)'
-    #     WebAppUri: webAppUrl
-    #     TakeAppOfflineFlag: true
-    #     UseWebDeploy: true
-    #     RenameFilesFlag: true
+      # Deploy App Service
+      - task: AzureRmWebAppDeployment@3
+        displayName: 'test'
+        inputs:
+          azureSubscription: '$(subscription)-sc'
+          appType: applinux
+          WebAppName: $(appName)
+          DockerNamespace: $(environment)$(stage)acr.azurecr.io
+          DockerRepository: $(Build.Repository.Name)
+          DockerImageTag: '$(version).$(revision)'
+          WebAppUri: webAppUrl
+          TakeAppOfflineFlag: true
+          UseWebDeploy: true
+          RenameFilesFlag: true
+          AppSettings: '-HTTP_LISTEN_PORT 8080 -APP_MESSAGE "Hello world from $(environment)" -APP_ENVIRONMENT "$(environment)-$(stage)" -APP_REVISION=$(version)$(revision)'
