@@ -58,7 +58,7 @@
         "appSettings": [
           {
             "name": "DOCKER_REGISTRY_SERVER_URL",
-            "value": "[concat('https://', reference(resourceId(subscription().subscriptionId, concat(parameters('acrEnvironment'), parameters('acrStage'), '-rg'), 'Microsoft.ContainerRegistry/registries', concat(parameters('acrEnvironment'), parameters('acrStage'), 'acr'))).loginServer)]"
+            "value": "[concat('https://', reference(resourceId(subscription().subscriptionId, concat(parameters('acrEnvironment'), parameters('acrStage'), '-rg'), 'Microsoft.ContainerRegistry/registries', concat(parameters('acrEnvironment'), parameters('acrStage'), 'acr')), '2018-07-01').loginServer)]"
           },
           {
             "name": "DOCKER_REGISTRY_SERVER_USERNAME",
@@ -74,7 +74,7 @@
           }
         ],
         "appCommandLine": "[concat('./', parameters('appName'))]",
-        "linuxFxVersion": "[concat('DOCKER|', reference(resourceId(subscription().subscriptionId, concat(parameters('acrEnvironment'), parameters('acrStage'), '-rg'), 'Microsoft.ContainerRegistry/registries', concat(parameters('acrEnvironment'), parameters('acrStage'), 'acr'))).loginServer, '/', parameters('appName'))]"
+        "linuxFxVersion": "[concat('DOCKER|', reference(resourceId(subscription().subscriptionId, concat(parameters('acrEnvironment'), parameters('acrStage'), '-rg'), 'Microsoft.ContainerRegistry/registries', concat(parameters('acrEnvironment'), parameters('acrStage'), 'acr')), '2018-07-01').loginServer, '/', parameters('appName'))]"
       },
       "serverFarmId": "[concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'), '-serviceplan')]",
       "hostingEnvironment": "",
