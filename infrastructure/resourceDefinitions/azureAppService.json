@@ -53,7 +53,7 @@
 
     },
     "properties": {
-      "name": "[parameters('appName')]",
+      "name": "[concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'))]",
       "siteConfig": {
         "appSettings": [
           {
