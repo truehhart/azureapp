@@ -1,4 +1,5 @@
 name: 'run-staging-deployment'
+trigger: ['none']
 resources:
   pipelines:
   - pipeline: 'run-staging-deployment'
