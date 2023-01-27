@@ -13,13 +13,18 @@ variables:
   location: 'westeurope'
 
 stages:
+# This pipeline deploys the only needed infrastructure for the project:
+# - The management resource group.
+# - The management container registry.
+# These resources will be reused across the project to host the app that's built.
 - stage: 'prepare_infrastructure'
+  displayName: 'Deploying Management Infrastructure'
   jobs: 
   - job: 'deploy_azure_resources'
     pool: localhost
     steps:
       - task: AzureResourceManagerTemplateDeployment@3
-        displayName: '[Azure] Deploy ResourceGroup'
+        displayName: '[Azure] Deploying ResourceGroup'
         inputs:
           deploymentScope: 'Subscription'
           templateLocation: 'Linked artifact'
@@ -29,7 +34,7 @@ stages:
           overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
 
       - task: AzureResourceManagerTemplateDeployment@3
-        displayName: '[Azure] Deploy ContainerRegistry'
+        displayName: '[Azure] Deploying ContainerRegistry'
         inputs:
           deploymentScope: 'Resource Group'
           templateLocation: 'Linked artifact'
