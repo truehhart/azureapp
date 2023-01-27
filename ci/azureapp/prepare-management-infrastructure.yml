@@ -35,6 +35,5 @@ stages:
           templateLocation: 'Linked artifact'
           csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureResourceGroup.json'
           ConnectedServiceName: '$(subscriptionName)-sc'
-          azureSubscription: '$(subscriptionName)'
           resourceGroupName: '$(environment)-$(stage)-rg'
           location: '$(location)'
