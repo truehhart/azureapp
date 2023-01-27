@@ -57,25 +57,22 @@
         "appSettings": [
           {
             "name": "DOCKER_REGISTRY_SERVER_URL",
-            "value": "[concat(
-            'https://', reference(concat('Microsoft.ContainerRegistry/registries/', parameters('acrEnvironment'), parameters('acrStage'))).loginServer)]"
+            "value": "[concat('https://', reference(concat('Microsoft.ContainerRegistry/registries/', parameters('acrEnvironment'), parameters('acrStage'))).loginServer)]"
           },
           {
             "name": "DOCKER_REGISTRY_SERVER_USERNAME",
-            "value": "[listCredentials(
-              concat('Microsoft.ContainerRegistry/registries/', parameters('acrEnvironment'), parameters('acrStage')), '2017-10-01').username]"
+            "value": "[listCredentials(concat('Microsoft.ContainerRegistry/registries/', parameters('acrEnvironment'), parameters('acrStage')), '2017-10-01').username]"
           },
           {
             "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
-            "value": "[listCredentials(
-              concat('Microsoft.ContainerRegistry/registries/', parameters('acrEnvironment'), parameters('acrStage')), '2017-10-01').passwords[0].value]"
+            "value": "[listCredentials(concat('Microsoft.ContainerRegistry/registries/', parameters('acrEnvironment'), parameters('acrStage')), '2017-10-01').passwords[0].value]"
           },
           {
             "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
             "value": "false"
           }
         ],
-        "appCommandLine": "[concat('/bin/sh', ' ', parameters('appName'))]",
+        "appCommandLine": "[concat('./', parameters('appName'))]",
         "linuxFxVersion": "[concat('DOCKER|', reference(concat('Microsoft.ContainerRegistry/registries/', parameters('acrEnvironment'), parameters('acrStage'))).loginServer, '/', parameters('appName'))]"
       },
       "serverFarmId": "[concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'), '-serviceplan')]",
