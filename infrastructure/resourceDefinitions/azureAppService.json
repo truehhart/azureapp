@@ -102,7 +102,7 @@
   {
     "type": "Microsoft.Insights/components",
     "name": "[concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'))]",
-    "apiVersion": "2014-04-01",
+    "apiVersion": "2020-02-02",
     "location": "[parameters('location')]",
     "tags": {
         "service": "insights",
@@ -114,7 +114,8 @@
     },
     "properties": {
         "applicationId": "[concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'))]",
-        "Request_Source": "AzureTfsExtensionAzureProject"
+        "Application_Type": "web",
+        "Request_Source": "rest"
     }
   }
   ]
