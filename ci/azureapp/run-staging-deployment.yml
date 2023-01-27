@@ -62,4 +62,4 @@ stages:
           TakeAppOfflineFlag: true
           UseWebDeploy: true
           RenameFilesFlag: true
-          AppSettings: '-HTTP_LISTEN_PORT 8080 -APP_MESSAGE "Hello world from $(environment)" -APP_ENVIRONMENT "$(environment)-$(stage)" -APP_REVISION=$(version)$(revision)'
+          AppSettings: '-HTTP_LISTEN_PORT 8080 -APP_MESSAGE "Hello world from $(environment)" -APP_ENVIRONMENT "$(environment)-$(stage)" -APP_REVISION $(version)$(revision)'

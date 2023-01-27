@@ -72,6 +72,10 @@
             "value": "false"
           },
           {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'))), '2017-10-01').InstrumentationKey]"
+          },
+          {
             "name": "WEBSITES_PORT",
             "value": "8080"
           }
@@ -91,8 +95,27 @@
       }
     },
     "dependsOn": [
-      "[concat('Microsoft.Web/serverfarms/', concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'), '-serviceplan'))]"
+      "[concat('Microsoft.Web/serverfarms/', concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'), '-serviceplan'))]",
+      "[resourceId('microsoft.insights/components/', concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName')))]"
     ]
+  },
+  {
+    "type": "Microsoft.Insights/components",
+    "name": "[concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'))]",
+    "apiVersion": "2014-04-01",
+    "location": "[parameters('location')]",
+    "tags": {
+        "service": "insights",
+        "application": "[parameters('appName')]",
+        "environment": "[parameters('environment')]",
+        "stage": "[parameters('stage')]",
+        "location": "[parameters('location')]",
+        "createdBy": "Azure Pipeline via ARM"
+    },
+    "properties": {
+        "applicationId": "[concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'))]",
+        "Request_Source": "AzureTfsExtensionAzureProject"
+    }
   }
   ]
 }
