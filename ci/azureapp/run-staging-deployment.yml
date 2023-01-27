@@ -52,7 +52,7 @@ stages:
       - task: AzureRmWebAppDeployment@3
         displayName: 'test'
         inputs:
-          azureSubscription: '$(subscription)-sc'
+          ConnectedServiceName: '$(subscriptionName)-sc'
           appType: applinux
           WebAppName: $(appName)
           DockerNamespace: $(environment)$(stage)acr.azurecr.io
