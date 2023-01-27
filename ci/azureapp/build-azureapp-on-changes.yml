@@ -43,6 +43,7 @@ stages:
           command: 'Build an image'
           imageName: '$(Build.Repository.Name):$(Build.BuildId).$(revision)'
           Dockerfile: 'build/dockerfiles/$(appName).Dockerfile'
+          useDefaultContext: false
           buildContext: '$(Build.Repository.LocalPath)'
           azureContainerRegistry: '$(environment)$(stage)acr.azurecr.io'
 
