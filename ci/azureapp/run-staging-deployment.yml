@@ -11,6 +11,7 @@ variables:
   version:
   acrEnvironment: 'management'
   acrStage:       'truehhart'
+  location:     'westeurope'
   environment:  'staging'
   stage:        'truehhart'
   appName:      'azureapp'

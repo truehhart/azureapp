@@ -51,7 +51,7 @@ stages:
           containerregistrytype: 'Azure Container Registry'
           azureSubscriptionEndpoint: '$(subscriptionName)-sc'
           command: 'Build an image'
-          imageName: '$(Build.Repository.Name):$(Build.BuildId).$(revision)'
+          imageName: '$(Build.Repository.Name):$(version).$(revision)'
           Dockerfile: 'build/dockerfiles/$(appName).Dockerfile'
           useDefaultContext: false
           buildContext: '$(Build.Repository.LocalPath)'
@@ -64,5 +64,5 @@ stages:
           containerregistrytype: 'Azure Container Registry'
           azureSubscriptionEndpoint: '$(subscriptionName)-sc'
           command: 'Push an image'
-          imageName: '$(Build.Repository.Name):$(Build.BuildId).$(revision)'
+          imageName: '$(Build.Repository.Name):$(version).$(revision)'
           azureContainerRegistry: '$(environment)$(stage)acr.azurecr.io'
