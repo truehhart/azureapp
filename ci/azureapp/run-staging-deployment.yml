@@ -55,7 +55,7 @@ stages:
           ConnectedServiceName: '$(subscriptionName)-sc'
           resourceGroupName: '$(environment)-$(stage)-rg'
           location: '$(location)'
-          overrideParameters: '-appName $(appName) -acrEnvironment $(acrEnvironment) -acrStage $(acrStage)'
+          overrideParameters: '-appName $(appName) -acrEnvironment $(acrEnvironment) -acrStage $(acrStage) -environment "$(environment)" -stage "$(stage)" -location $(location)'
 
     # # Deploy App Service
     # - task: AzureRmWebAppDeployment@3
