@@ -16,8 +16,8 @@
     "name": "[concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'), '-serviceplan')]",
     "type": "Microsoft.Web/serverfarms",
     "sku": {
-      "Tier": "[first(skip(split(parameters('servicePlanSku'), ' '), 1))]",
-      "Name": "[first(split(parameters('servicePlanSku'), ' '))]"
+      "name": "[split(parameters('servicePlanSku'), ' ')[1]]",
+      "tier": "[split(parameters('servicePlanSku'), ' ')[0]]"
     },
     "kind": "linux",
     "apiVersion": "2020-12-01",
