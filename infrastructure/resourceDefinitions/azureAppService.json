@@ -81,8 +81,7 @@
           }
         ],
         "appCommandLine": "[concat('./', parameters('appName'))]",
-        "linuxFxVersion": "[concat('DOCKER|', reference(resourceId(subscription().subscriptionId, concat(parameters('acrEnvironment'), '-', parameters('acrStage'), '-rg'), 'Microsoft.ContainerRegistry/registries', concat(parameters('acrEnvironment'), parameters('acrStage'), 'acr')), '2021-09-01').loginServer, '/', parameters('appName'))]",
-        "acrUseManagedIdentityCreds": true
+        "linuxFxVersion": "[concat('DOCKER|', reference(resourceId(subscription().subscriptionId, concat(parameters('acrEnvironment'), '-', parameters('acrStage'), '-rg'), 'Microsoft.ContainerRegistry/registries', concat(parameters('acrEnvironment'), parameters('acrStage'), 'acr')), '2021-09-01').loginServer, '/', parameters('appName'))]"
       },
       "serverFarmId": "[concat(parameters('environment'), '-', parameters('stage'), '-', parameters('appName'), '-serviceplan')]",
       "hostingEnvironment": "",
