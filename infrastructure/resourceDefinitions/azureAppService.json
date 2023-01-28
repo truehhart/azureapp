@@ -5,7 +5,6 @@
     "acrResourceGroup": "[concat(parameters('acrEnvironment'), '-', parameters('acrStage'), '-rg')]",
     "acrName": "[concat(parameters('acrEnvironment'), parameters('acrStage'), 'acr')]",
     "fullApplicationName": "[concat(parameters('environment'),'-', parameters('stage'), '-', parameters('appName'))]",
-    "appIdentityName": "[concat(parameters('environment'), '-', parameters('stage'), '-acr-identity')]",
     "acrPullRoleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '7f951dda-4ed3-4680-a7ca-43fe172d538d')]"
   },
   "parameters": {
@@ -68,50 +67,6 @@
       }
     },
 
-  //   // Managed Identity for App Pull Access
-  //   {
-  //       "name": "[variables('appIdentityName')]",
-  //       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-  //       "apiVersion": "2018-11-30",
-  //       "location": "[parameters('location')]"
-  //   },
-
-  //   // Role assignment to the Container Registry
-  // {
-  //   "name": "[concat(variables('fullApplicationName'), '-roleassignment')]",
-  //   "type": "Microsoft.Resources/deployments",
-  //   "apiVersion": "2021-04-01",
-  //   "resourceGroup": "[variables('acrResourceGroup')]",
-  //   "properties": {
-  //     "expressionEvaluationOptions": {
-  //       "scope": "Outer"
-  //     },
-  //     "mode": "Incremental",
-  //     "template": {
-  //       "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  //       "contentVersion": "1.0.0.0",
-  //       "parameters": {},
-  //       "variables": {
-  //       },
-  //       "resources": [
-  //         {
-  //           "type": "Microsoft.ContainerRegistry/registries/providers/roleAssignments",
-  //           "apiVersion": "2017-05-01",
-  //           "name": "[concat(variables('acrName'), '/Microsoft.Authorization/', guid(concat(variables('fullApplicationName'), variables('acrPullRoleDefinitionId'))))]",
-  //           "properties": {
-  //             "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('appIdentityName'))).principalId]",
-  //             "roleDefinitionId": "[variables('acrPullRoleDefinitionId')]"
-  //           }
-  //         }
-  //       ],
-  //       "outputs": {}
-  //     }
-  //   },
-  //   "dependsOn": [
-  //     "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('appIdentityName'))]"
-  //   ]
-  //   },
-
 {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2020-10-01",
@@ -148,7 +103,7 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('fullApplicationName')]",
-      "apiVersion": "2020-12-01",
+      "apiVersion": "2018-11-01",
       "location": "[parameters('location')]",
       "identity": {
         "type": "SystemAssigned"
@@ -165,11 +120,11 @@
         "name": "[variables('fullApplicationName')]",
         "siteConfig": {
           "appSettings": [
-            {
-              "name": "DOCKER_REGISTRY_SERVER_URL",
-              "value": "[concat('https://', reference(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2021-09-01').loginServer)]"
-            },
             // {
+            //   "name": "DOCKER_REGISTRY_SERVER_URL",
+            //   "value": "[concat('https://', reference(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2021-09-01').loginServer)]"
+            // },
+            // // {
             //   "name": "DOCKER_REGISTRY_SERVER_USERNAME",
             //   "value": "[listCredentials(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2017-10-01').username]"
             // },
