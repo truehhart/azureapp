@@ -1,0 +1,47 @@
+# This job should be run one time per-environment only.
+# It creates the Resource Group, the Service Application, Service App Plan, User-Managed Identity Role, etc.
+trigger: ['none']
+
+name: 'prepare-azureapp-infrastructure'
+
+parameters:
+  - name: 'environment'
+    type: 'string'
+    default: 'staging'
+  - name: 'stage'
+    type: 'string'
+    default: 'truehhart'
+  - name: 'location'
+    type: 'string'
+    default: 'westeurope'
+
+variables:
+  acrEnvironment: 'management'
+  acrStage:       '${{ parameters.stage }}'
+  environment:  'staging'
+  stage:        'truehhart'
+  appName:      'azureapp'
+  subscriptionName: 'main'
+
+stages:
+# This pipeline deploys the only needed infrastructure for the project:
+# - The management resource group.
+# - The management container registry.
+# These resources will be reused across the project to host the app that's built.
+- stage: 'prepare_infrastructure'
+  displayName: 'Deploying Management Infrastructure'
+  jobs:
+  - job: 'deploy_azure_resources'
+    pool: localhost
+    steps:
+      # Now we deploy a WebApp to Azure App Service.
+      - task: AzureResourceManagerTemplateDeployment@3
+        displayName: '[Azure] Deploying ${{ variables.appName }} App Service to ${{ parameters.environment }}-${{ parameters.stage }}'
+        inputs:
+          deploymentScope: 'Resource Group'
+          templateLocation: 'Linked artifact'
+          csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureAppService.json'
+          ConnectedServiceName: '$(subscriptionName)-sc'
+          resourceGroupName: '$(environment)-$(stage)-rg'
+          location: '$(location)'
+          overrideParameters: '-appName $(appName) -acrEnvironment $(acrEnvironment) -acrStage $(acrStage) -environment "${{ parameters.environment }}" -stage "${{ parameters.stage }}" -location ${{ parameters.location }}'
