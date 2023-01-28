@@ -14,6 +14,10 @@ func ReturnMessage(input map[string]string) http.HandlerFunc {
 	}
 }
 
+func ReturnOk(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+}
+
 func ReturnEnv(value string, status bool) string {
 	return value
 }
