@@ -41,7 +41,7 @@
                 "createdBy": "Azure Pipeline via ARM"
             },
             "properties": {
-                "adminUserEnabled": false
+                "adminUserEnabled": true
             }
         }
     ]

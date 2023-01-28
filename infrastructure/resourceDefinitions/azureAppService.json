@@ -120,18 +120,18 @@
         "name": "[variables('fullApplicationName')]",
         "siteConfig": {
           "appSettings": [
-            // {
-            //   "name": "DOCKER_REGISTRY_SERVER_URL",
-            //   "value": "[concat('https://', reference(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2021-09-01').loginServer)]"
-            // },
-            // // {
-            //   "name": "DOCKER_REGISTRY_SERVER_USERNAME",
-            //   "value": "[listCredentials(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2017-10-01').username]"
-            // },
-            // {
-            //   "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
-            //   "value": "[listCredentials(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2017-10-01').passwords[0].value]"
-            // },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_URL",
+              "value": "[concat('https://', reference(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2021-09-01').loginServer)]"
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+              "value": "[listCredentials(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2017-10-01').username]"
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+              "value": "[listCredentials(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2017-10-01').passwords[0].value]"
+            },
             {
               "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
               "value": "false"
