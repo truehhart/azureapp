@@ -68,48 +68,80 @@
       }
     },
 
-    // Managed Identity for App Pull Access
-    {
-        "name": "[variables('appIdentityName')]",
-        "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-        "apiVersion": "2018-11-30",
-        "location": "[parameters('location')]"
-    },
+  //   // Managed Identity for App Pull Access
+  //   {
+  //       "name": "[variables('appIdentityName')]",
+  //       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+  //       "apiVersion": "2018-11-30",
+  //       "location": "[parameters('location')]"
+  //   },
 
-    // Role assignment to the Container Registry
-  {
-    "name": "[concat(variables('fullApplicationName'), '-roleassignment')]",
-    "type": "Microsoft.Resources/deployments",
-    "apiVersion": "2021-04-01",
-    "resourceGroup": "[variables('acrResourceGroup')]",
-    "properties": {
-      "expressionEvaluationOptions": {
-        "scope": "Outer"
-      },
-      "mode": "Incremental",
-      "template": {
-        "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-        "contentVersion": "1.0.0.0",
+  //   // Role assignment to the Container Registry
+  // {
+  //   "name": "[concat(variables('fullApplicationName'), '-roleassignment')]",
+  //   "type": "Microsoft.Resources/deployments",
+  //   "apiVersion": "2021-04-01",
+  //   "resourceGroup": "[variables('acrResourceGroup')]",
+  //   "properties": {
+  //     "expressionEvaluationOptions": {
+  //       "scope": "Outer"
+  //     },
+  //     "mode": "Incremental",
+  //     "template": {
+  //       "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  //       "contentVersion": "1.0.0.0",
+  //       "parameters": {},
+  //       "variables": {
+  //       },
+  //       "resources": [
+  //         {
+  //           "type": "Microsoft.ContainerRegistry/registries/providers/roleAssignments",
+  //           "apiVersion": "2017-05-01",
+  //           "name": "[concat(variables('acrName'), '/Microsoft.Authorization/', guid(concat(variables('fullApplicationName'), variables('acrPullRoleDefinitionId'))))]",
+  //           "properties": {
+  //             "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('appIdentityName'))).principalId]",
+  //             "roleDefinitionId": "[variables('acrPullRoleDefinitionId')]"
+  //           }
+  //         }
+  //       ],
+  //       "outputs": {}
+  //     }
+  //   },
+  //   "dependsOn": [
+  //     "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('appIdentityName'))]"
+  //   ]
+  //   },
+
+{
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[concat(variables('fullApplicationName'), '-roleassignment')]",
+      "resourceGroup": "[variables('acrResourceGroup')]",
+      "properties": {
+        "mode": "Incremental",
         "parameters": {},
-        "variables": {
-        },
-        "resources": [
-          {
-            "type": "Microsoft.ContainerRegistry/registries/providers/roleAssignments",
-            "apiVersion": "2017-05-01",
-            "name": "[concat(variables('acrName'), '/Microsoft.Authorization/', guid(concat(variables('fullApplicationName'), variables('acrPullRoleDefinitionId'))))]",
-            "properties": {
-              "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('appIdentityName'))).principalId]",
-              "roleDefinitionId": "[variables('acrPullRoleDefinitionId')]"
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {},
+          "parameters": {},
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2020-04-01-preview",
+              "name": "[guid(concat('Microsoft.Web/sites/', variables('fullApplicationName')))]",
+              "properties": {
+                "roleDefinitionId": "[variables('acrPullRoleDefinitionId')]",
+                "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('fullApplicationName')),'2019-08-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+              }
             }
-          }
-        ],
-        "outputs": {}
-      }
-    },
-    "dependsOn": [
-      "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('appIdentityName'))]"
-    ]
+          ]
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/sites/', variables('fullApplicationName'))]"
+      ]
     },
 
     // Application
