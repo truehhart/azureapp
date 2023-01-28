@@ -6,7 +6,7 @@
     "acrName": "[concat(parameters('acrEnvironment'), parameters('acrStage'), 'acr')]",
     "fullApplicationName": "[concat(parameters('environment'),'-', parameters('stage'), '-', parameters('appName'))]",
     "appIdentityName": "[concat(parameters('environment'), '-', parameters('stage'), '-acr-identity')]",
-    "acrPullRoleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]"
+    "acrPullRoleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '7f951dda-4ed3-4680-a7ca-43fe172d538d')]"
   },
   "parameters": {
     "appName": {"type": "string", "metadata": {"description": "Application name"}},
