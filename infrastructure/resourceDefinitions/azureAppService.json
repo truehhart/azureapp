@@ -45,60 +45,6 @@
       }
     },
 
-    // Instrumentation
-    {
-      "type": "Microsoft.Insights/components",
-      "name": "[variables('fullApplicationName')]",
-      "kind": "web",
-      "apiVersion": "2020-02-02",
-      "location": "[parameters('location')]",
-      "tags": {
-          "service": "insights",
-          "application": "[parameters('appName')]",
-          "environment": "[parameters('environment')]",
-          "stage": "[parameters('stage')]",
-          "location": "[parameters('location')]",
-          "createdBy": "Azure Pipeline via ARM"
-      },
-      "properties": {
-          "applicationId": "[variables('fullApplicationName')]",
-          "Application_Type": "web",
-          "Flow_Type": "Bluefield"
-      }
-    },
-
-{
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2020-10-01",
-      "name": "[concat(variables('fullApplicationName'), '-roleassignment')]",
-      "resourceGroup": "[variables('acrResourceGroup')]",
-      "properties": {
-        "mode": "Incremental",
-        "parameters": {},
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {},
-          "parameters": {},
-          "resources": [
-            {
-              "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2020-04-01-preview",
-              "name": "[guid(concat('Microsoft.Web/sites/', variables('fullApplicationName')))]",
-              "properties": {
-                "roleDefinitionId": "[variables('acrPullRoleDefinitionId')]",
-                "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('fullApplicationName')),'2019-08-01', 'full').identity.principalId]",
-                "principalType": "ServicePrincipal"
-              }
-            }
-          ]
-        }
-      },
-      "dependsOn": [
-        "[concat('Microsoft.Web/sites/', variables('fullApplicationName'))]"
-      ]
-    },
-
     // Application
     {
       "type": "Microsoft.Web/sites",
@@ -137,10 +83,6 @@
               "value": "false"
             },
             {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('microsoft.insights/components/', variables('fullApplicationName')), '2020-02-02').InstrumentationKey]"
-            },
-            {
               "name": "WEBSITES_PORT",
               "value": "8080"
             }
@@ -161,8 +103,40 @@
         }
       },
       "dependsOn": [
-        "[concat('Microsoft.Web/serverfarms/', concat(variables('fullApplicationName'), '-serviceplan'))]",
-        "[resourceId('microsoft.insights/components/', variables('fullApplicationName'))]"
+        "[concat('Microsoft.Web/serverfarms/', concat(variables('fullApplicationName'), '-serviceplan'))]"
+      ]
+    },
+
+    // Identity
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[concat(variables('fullApplicationName'), '-roleassignment')]",
+      "resourceGroup": "[variables('acrResourceGroup')]",
+      "properties": {
+        "mode": "Incremental",
+        "parameters": {},
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {},
+          "parameters": {},
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2020-04-01-preview",
+              "name": "[guid(concat('Microsoft.Web/sites/', variables('fullApplicationName')))]",
+              "properties": {
+                "roleDefinitionId": "[variables('acrPullRoleDefinitionId')]",
+                "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('fullApplicationName')),'2019-08-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/sites/', variables('fullApplicationName'))]"
       ]
     }
 
