@@ -35,10 +35,9 @@
 <script>
   function GetHelloWorldData() {
       var currenturl = window.location.href.replace('/assets', '');
-      var fresult = "randomstuff";
       var resultDiv = document.getElementById("result-div")
 
-      fetch(currenturl + 'helloworld')
+      fetch(currenturl + 'api/helloworld')
         .then(res => res.json())
         .then(data =>
           resultDiv.innerHTML = "Results:"

@@ -14,6 +14,12 @@ func ReturnMessage(input map[string]string) http.HandlerFunc {
 	}
 }
 
+func Redirect(redirectPath string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, redirectPath, http.StatusFound)
+	}
+}
+
 func ReturnOk(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }

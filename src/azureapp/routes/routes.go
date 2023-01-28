@@ -22,9 +22,9 @@ func Router() *mux.Router {
 		"message": handlers.ReturnEnv(os.LookupEnv("APP_MESSAGE")),
 		"revision": handlers.ReturnEnv(os.LookupEnv("APP_REVISION")),
 	}
-	router.HandleFunc("/helloworld", handlers.ReturnMessage(messageToReturn)).Methods("GET")
-	router.HandleFunc("/", handlers.ReturnOk).Methods("GET")
+	router.HandleFunc("/api/helloworld", handlers.ReturnMessage(messageToReturn)).Methods("GET")
 	router.PathPrefix("/index.html").Handler(staticFileHandler).Methods("GET")
+	router.Path("/").Handler(handlers.Redirect("/assets/index.html"))
 
 	return router
 }

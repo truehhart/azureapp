@@ -114,7 +114,8 @@
             }
           ],
           "linuxFxVersion": "[concat('DOCKER|', reference(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2021-09-01').loginServer, '/', parameters('appName'))]",
-          "acrUseManagedIdentityCreds": true
+          "acrUseManagedIdentityCreds": true,
+          "httpLoggingEnabled": true
         },
         "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('fullApplicationName'), '-serviceplan')]",
         "hostingEnvironment": "",
