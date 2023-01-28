@@ -113,7 +113,6 @@
               "value": "8080"
             }
           ],
-          "appCommandLine": "[concat('./', parameters('appName'))]",
           "linuxFxVersion": "[concat('DOCKER|', reference(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2021-09-01').loginServer, '/', parameters('appName'))]",
           "acrUseManagedIdentityCreds": true
         },
