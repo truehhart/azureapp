@@ -43,5 +43,5 @@ stages:
           csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureAppService.json'
           ConnectedServiceName: '$(subscriptionName)-sc'
           resourceGroupName: '$(environment)-$(stage)-rg'
-          location: '$(location)'
+          location: '${{ parameters.location }}'
           overrideParameters: '-appName $(appName) -acrEnvironment $(acrEnvironment) -acrStage $(acrStage) -environment "${{ parameters.environment }}" -stage "${{ parameters.stage }}" -location ${{ parameters.location }}'
