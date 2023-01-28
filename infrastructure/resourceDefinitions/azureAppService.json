@@ -97,7 +97,7 @@
           {
             "type": "Microsoft.ContainerRegistry/registries/providers/roleAssignments",
             "apiVersion": "2017-05-01",
-            "name": "[concat(variables('acrName'), '/Microsoft.Authorization/', guid(concat(variables('fullApplicationName'))))]",
+            "name": "[concat(variables('acrName'), '/Microsoft.Authorization/', guid(concat(variables('fullApplicationName'), variables('acrPullRoleDefinitionId'))))]",
             "properties": {
               "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('appIdentityName'))).principalId]",
               "roleDefinitionId": "[variables('acrPullRoleDefinitionId')]"
