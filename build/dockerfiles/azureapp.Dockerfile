@@ -5,7 +5,7 @@ ADD ./src/azureapp/ /build/
 ADD ./src/azureapp/assets/ /output/assets/
 
 RUN go mod download \
-    && go build -o /output/azureapp
+    && GOOS=linux GOARCH=amd64 go build -o /output/azureapp
 
 FROM alpine:latest
 
