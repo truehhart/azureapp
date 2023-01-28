@@ -1,12 +1,28 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "variables": {},
+    "variables": {
+        "acrName": "[concat(parameters('environment'), parameters('stage'), 'acr')]"
+    },
+    "outputs": {
+        "test": {
+            "type": "string",
+            "value": "[guid(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', concat(parameters('environment'), '-', parameters('stage'), '-uaid')), resourceGroup().id, concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7'))]"
+        },
+        "test2": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', concat(parameters('environment'), '-', parameters('stage'), '-uaid'))]"
+        },
+        "test3": {
+            "type": "string",
+            "value": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]"
+        }
+    },
     "parameters": {
-      "sku": {"type": "string", "metadata": {"description": "SKU For the ACR"}, "defaultValue": "Basic"},
-      "environment": {"type": "string", "metadata": {"description": "Azure Deployment Environment"}},
-      "stage": {"type": "string", "metadata": {"description": "Azure Deployment Stage"}},
-      "location": {"type": "string", "metadata": {"description": "Azure Deployment Location"}, "defaultValue": "westeurope"}
+        "sku": {"type": "string", "metadata": {"description": "SKU For the ACR"}, "defaultValue": "Basic"},
+        "environment": {"type": "string", "metadata": {"description": "Azure Deployment Environment"}},
+        "stage": {"type": "string", "metadata": {"description": "Azure Deployment Stage"}},
+        "location": {"type": "string", "metadata": {"description": "Azure Deployment Location"}, "defaultValue": "westeurope"}
     },
     "resources": [
         {
@@ -14,19 +30,19 @@
             "sku": {
                 "name": "[parameters('sku')]"
             },
-            "name": "[concat(parameters('environment'), parameters('stage'), 'acr')]",
+            "name": "[variables('acrName')]",
             "apiVersion": "2017-10-01",
             "location": "[parameters('location')]",
-            "properties": {
-                "adminUserEnabled": true
-            },
             "tags": {
-              "service": "containerregistry",
-              "environment": "[parameters('environment')]",
-              "stage": "[parameters('stage')]",
-              "location": "[parameters('location')]",
-              "createdBy": "Azure Pipeline via ARM"
-          }
+                "service": "containerregistry",
+                "environment": "[parameters('environment')]",
+                "stage": "[parameters('stage')]",
+                "location": "[parameters('location')]",
+                "createdBy": "Azure Pipeline via ARM"
+            },
+            "properties": {
+                "adminUserEnabled": false
+            }
         }
     ]
 }
