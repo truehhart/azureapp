@@ -1,9 +1,9 @@
 package main
 
 import (
-	"log"
+	//"log"
 	"net/http"
-	"os"
+	//"os"
 	"strings"
 
 	"github.com/truehhart/azureapp/src/azureapp/routes"
@@ -24,7 +24,7 @@ func main() {
 	// 	}
 	// }
 
-	listenPort, _ := os.LookupEnv("HTTP_LISTEN_PORT")
+	// listenPort, _ := os.LookupEnv("HTTP_LISTEN_PORT")
 	
 	http.ListenAndServe(strings.Join([]string{":", "8080"}, ""), routes.Router())
 }
