@@ -10,6 +10,7 @@ variables:
   # These variables are set during runtime.
   revision:
   version:
+  vmImage: 'ubuntu-latest'
   acrEnvironment: 'management'
   acrStage:       'truehhart'
   location:     'westeurope'
@@ -22,7 +23,8 @@ stages:
 - stage: 'deploy_to_staging'
   jobs:
   - job: 'release_application_to_staging'
-    pool: 'localhost'
+    pool:
+      vmImage: $(vmImage)
     steps:
       # Unfortunately, I hasn't found a way for AzPipelines to reliably pass information between pipelines, but I still wanted to have them separate.
       # So we repeat the tasks to get build version from the previous pipeline.

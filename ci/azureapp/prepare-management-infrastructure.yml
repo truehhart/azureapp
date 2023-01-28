@@ -5,6 +5,7 @@ trigger: ['none']
 
 name: 'prepare-management-infrastructure'
 variables:
+  vmImage: 'ubuntu-latest'
   environment: 'management'
   stage: 'truehhart'
   subscriptionName: 'main'
@@ -20,7 +21,8 @@ stages:
   displayName: 'Deploying Management Infrastructure'
   jobs:
   - job: 'deploy_azure_resources'
-    pool: localhost
+    pool:
+      vmImage: $(vmImage)
     steps:
       - task: AzureResourceManagerTemplateDeployment@3
         displayName: '[Azure] Deploying ${{ variables.environment }}-${{ variables.stage }} ContainerRegistry'

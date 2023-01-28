@@ -12,6 +12,7 @@ variables:
   version:
   # We use a 'shared' management environment to host docker containers.
   # This would ensure that production would get the same image that was tested on staging
+  vmImage: 'ubuntu-latest'
   subscriptionName: 'main'
   environment: 'management'
   stage:       'truehhart'
@@ -25,7 +26,8 @@ stages:
   displayName: 'Building ${{ variables.appName }}'
   jobs:
   - job: 'build_and_push_container'
-    pool: 'localhost'
+    pool: 
+      vmImage: $(vmImage)
     steps:
       # For CD we are going to utlize the fact that "triggered" builds follow the same branch/revision that the job that has triggered them.
       # As such, we don't have to worry about newer commits appearing during the job - the pipeline chain will work with the same revision.
