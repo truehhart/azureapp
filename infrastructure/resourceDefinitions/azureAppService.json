@@ -150,6 +150,9 @@
       "name": "[variables('fullApplicationName')]",
       "apiVersion": "2020-12-01",
       "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
       "tags": {
         "service": "appservice",
         "application": "[parameters('appName')]",
