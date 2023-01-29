@@ -7,9 +7,6 @@ resources:
     trigger: true
 
 variables:
-  # These variables are set during runtime.
-  revision:
-  version:
   vmImage: 'ubuntu-latest'
   acrEnvironment: 'management'
   acrStage:       'truehhart'
@@ -31,17 +28,20 @@ stages:
       # Unfortunately, I hasn't found a way for AzPipelines to reliably pass information between pipelines, but I still wanted to have them separate.
       # So we repeat the tasks to get build version from the previous pipeline.
       - task: CmdLine@2
+        name: 'get_source_version'
         displayName: '[Build] Getting current source version'
         inputs:
           workingDirectory: '$(Build.Repository.LocalPath)'
           script: 'version=`cat ./src/$(appName)/.version`; echo "##vso[task.setvariable variable=version]$version"'
       - task: CmdLine@2
+        name: 'get_source_revision'
         displayName: '[Build] Getting current git revision'
         inputs:
           script: 'revision=`echo "$(Build.SourceVersion)" | head -c 7`; echo "##vso[task.setvariable variable=revision]$revision"'
 
       # This task finalises the deployment by providing the correct values and image to the deployment.
       - task: AzureRmWebAppDeployment@3
+        name: 'deploy_webapp'
         displayName: '[Deploy] Deploying $(appName) to $(environment)-$(stage)'
         inputs:
           ConnectedServiceName: '$(subscriptionName)-sc'
@@ -61,7 +61,12 @@ stages:
         displayName: '[Outputs] Echo the WebApp url'
         inputs:
           script: 'echo $(webAppUrl)'
+
 - stage: 'run_tests_on_staging'
+  variables:
+    webAppUrl: $[ stageDependencies.deploy_to_staging.release_application_to_staging.outputs['deploy_webapp.webAppUrl'] ]
+    revision: $[ stageDependencies.deploy_to_staging.release_application_to_staging.outputs['get_source_revision.revision'] ]
+    version: $[ stageDependencies.deploy_to_staging.release_application_to_staging.outputs['get_source_version.version'] ]
   displayName: 'Running tests'
   jobs:
   - job: 'run_test'
@@ -72,5 +77,5 @@ stages:
       - task: Go@0
         inputs:
           command: 'test'
-          arguments: '-v -rev "$(version).$(revision)" -msg "HeHello world from $(environment)" -url "$(webAppUrl)"'
+          arguments: -v -rev "$(version).$(revision)" -msg "Hello world from $(environment)" -url "$(webAppUrl)"
           workingDirectory: 'src/azureapp'
