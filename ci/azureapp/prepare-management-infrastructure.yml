@@ -35,3 +35,9 @@ stages:
           resourceGroupName: '$(environment)-$(stage)-rg'
           location: '$(location)'
           overrideParameters: '-environment "$(environment)" -stage "$(stage)" -location $(location)'
+
+      # Finally, output the deployment's URL to stdout in Azure Pipelines
+      - task: CmdLine@2
+        displayName: '[Outputs] Echo the WebApp url'
+        inputs:
+          script: 'echo $(set_webapp_url.appUrl)'
