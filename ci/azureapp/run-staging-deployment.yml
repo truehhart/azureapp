@@ -32,16 +32,15 @@ stages:
         displayName: '[Build] Getting current source version'
         inputs:
           workingDirectory: '$(Build.Repository.LocalPath)'
-          script: 'version=`cat ./src/$(appName)/.version`; echo "##vso[task.setvariable variable=version]$version"'
+          script: 'version=`cat ./src/$(appName)/.version`; echo "##vso[task.setvariable variable=version;isOutput=true]$version"'
       - task: CmdLine@2
         name: 'get_source_revision'
         displayName: '[Build] Getting current git revision'
         inputs:
-          script: 'revision=`echo "$(Build.SourceVersion)" | head -c 7`; echo "##vso[task.setvariable variable=revision]$revision"'
+          script: 'revision=`echo "$(Build.SourceVersion)" | head -c 7`; echo "##vso[task.setvariable variable=revision;isOutput=true]$revision"'
 
       # This task finalises the deployment by providing the correct values and image to the deployment.
       - task: AzureRmWebAppDeployment@3
-        name: 'deploy_webapp'
         displayName: '[Deploy] Deploying $(appName) to $(environment)-$(stage)'
         inputs:
           ConnectedServiceName: '$(subscriptionName)-sc'
@@ -58,13 +57,14 @@ stages:
 
       # Finally, output the deployment's URL to stdout in Azure Pipelines
       - task: CmdLine@2
+        name: 'set_webapp_url'
         displayName: '[Outputs] Echo the WebApp url'
         inputs:
-          script: 'echo $(webAppUrl)'
+          script: 'appUrl=`echo "$(webAppUrl)"`; echo "##vso[task.setvariable variable=appUrl;isOutput=true]$appUrl"'
 
 - stage: 'run_tests_on_staging'
   variables:
-    webAppUrl: $[ stageDependencies.deploy_to_staging.release_application_to_staging.outputs['deploy_webapp.webAppUrl'] ]
+    webAppUrl: $[ stageDependencies.deploy_to_staging.release_application_to_staging.outputs['set_webapp_url.appUrl'] ]
     revision: $[ stageDependencies.deploy_to_staging.release_application_to_staging.outputs['get_source_revision.revision'] ]
     version: $[ stageDependencies.deploy_to_staging.release_application_to_staging.outputs['get_source_version.version'] ]
   displayName: 'Running tests'
