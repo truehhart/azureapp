@@ -19,8 +19,6 @@ variables:
   vmImage: 'ubuntu-latest'
   acrEnvironment: 'management'
   acrStage:       '${{ parameters.stage }}'
-  environment:  'staging'
-  stage:        'truehhart'
   appName:      'azureapp'
   subscriptionName: 'main'
 
@@ -45,6 +43,6 @@ stages:
           templateLocation: 'Linked artifact'
           csmFile:  '$(Build.Repository.LocalPath)/infrastructure/resourceDefinitions/azureAppService.json'
           ConnectedServiceName: '$(subscriptionName)-sc'
-          resourceGroupName: '$(environment)-$(stage)-rg'
+          resourceGroupName: '${{ parameters.environment }}-${{ parameters.stage }}-rg'
           location: '${{ parameters.location }}'
           overrideParameters: '-appName $(appName) -acrEnvironment $(acrEnvironment) -acrStage $(acrStage) -environment "${{ parameters.environment }}" -stage "${{ parameters.stage }}" -location ${{ parameters.location }}'
