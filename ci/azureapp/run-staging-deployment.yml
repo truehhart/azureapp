@@ -55,12 +55,19 @@ stages:
           RenameFilesFlag: true
           AppSettings: '-HTTP_LISTEN_PORT 8080 -APP_MESSAGE "Hello world from $(environment)" -APP_ENVIRONMENT "$(environment)-$(stage)" -APP_REVISION $(get_source_version.version).$(get_source_revision.revision)'
 
+      # Set appUrl variable for next stage
+      - task: CmdLine@2
+        name: 'set_webapp_url'
+        displayName: '[Outputs] Set the appUrl output variable'
+        inputs:
+          script: 'appUrl=`echo "$(webAppUrl)"`; echo "##vso[task.setvariable variable=appUrl;isOutput=true]$appUrl"'
+
       # Finally, output the deployment's URL to stdout in Azure Pipelines
       - task: CmdLine@2
         name: 'set_webapp_url'
         displayName: '[Outputs] Echo the WebApp url'
         inputs:
-          script: 'echo "$(webAppUrl); "appUrl=`echo "$(webAppUrl)"`; echo "##vso[task.setvariable variable=appUrl;isOutput=true]$appUrl"'
+          script: 'echo $(set_webapp_url.appUrl)'
 
 - stage: 'run_tests_on_staging'
   variables:
