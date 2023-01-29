@@ -1,0 +1,23 @@
+trigger: ['none']
+
+name: 'test-go-app'
+variables:
+  vmImage: 'ubuntu-latest'
+  # environment: 'staging'
+  # stage: 'truehhart'
+  # appName: 'azureapp'
+  # location: 'westeurope'
+
+stages:
+- stage: 'test_app'
+  displayName: 'Deploying Management Infrastructure'
+  jobs:
+  - job: 'run_test'
+    pool:
+      vmImage: $(vmImage)
+    steps:
+      - task: Go@0
+        inputs:
+          command: 'test'
+          arguments: '-v -rev "0.0.142c6d9e" -msg "Hello world from staging" -url "https://staging-truehhart-azureapp.azurewebsites.net/"'
+          workingDirectory: 'src/azureapp'
