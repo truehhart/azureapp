@@ -64,7 +64,6 @@ stages:
 
       # Finally, output the deployment's URL to stdout in Azure Pipelines
       - task: CmdLine@2
-        name: 'set_webapp_url'
         displayName: '[Outputs] Echo the WebApp url'
         inputs:
           script: 'echo $(set_webapp_url.appUrl)'
