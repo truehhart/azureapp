@@ -51,6 +51,7 @@ stages:
         inputs:
           ConnectedServiceName: '$(subscriptionName)-sc'
           appType: 'applinux'
+          ResourceGroupName: '$(environment)-$(stage)-rg'
           WebAppName: '$(environment)-$(stage)-$(appName)'
           DockerNamespace: '$(acrEnvironment)$(acrStage)acr.azurecr.io'
           DockerRepository: '$(Build.Repository.Name)'
