@@ -1,0 +1,171 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "variables": {
+    "acrResourceGroup": "[concat(parameters('acrEnvironment'), '-', parameters('acrStage'), '-rg')]",
+    "acrName": "[concat(parameters('acrEnvironment'), parameters('acrStage'), 'acr')]",
+    "fullApplicationName": "[concat(parameters('environment'),'-', parameters('stage'), '-', parameters('appName'))]",
+    "acrPullRoleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '7f951dda-4ed3-4680-a7ca-43fe172d538d')]"
+  },
+  "parameters": {
+    "appName": {"type": "string", "metadata": {"description": "Application name"}},
+    "environment": {"type": "string", "metadata": {"description": "Azure Deployment Environment"}},
+    "stage": {"type": "string", "metadata": {"description": "Azure Deployment Stage"}},
+    "location": {"type": "string", "metadata": {"description": "Azure Deployment Location"}, "defaultValue": "westeurope"},
+    "servicePlanSku": {"type": "string", "metadata": {"description": "SKU For the Service Plan"}, "defaultValue": "Free F1"},
+    "acrEnvironment": {"type": "string", "metadata": {"description": "Environment where Azure Container Registry is Deployed"}},
+    "acrStage":       {"type": "string", "metadata": {"description": "Stage where Azure Container Registry is Deployed"}}
+  },
+  "resources": [
+    // Service Plan
+    {
+      "name": "[concat(variables('fullApplicationName'), '-serviceplan')]",
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "name": "[split(parameters('servicePlanSku'), ' ')[1]]",
+        "tier": "[split(parameters('servicePlanSku'), ' ')[0]]"
+      },
+      "kind": "linux",
+      "apiVersion": "2020-12-01",
+      "location": "[parameters('location')]",
+      "properties": {
+        "name": "[concat(variables('fullApplicationName'), '-serviceplan')]",
+        "workerSizeId": "0",
+        "reserved": true,
+        "numberOfWorkers": "1",
+        "hostingEnvironment": ""
+      },
+      "tags": {
+        "service": "appserviceplan",
+        "application": "[parameters('appName')]",
+        "environment": "[parameters('environment')]",
+        "stage": "[parameters('stage')]",
+        "location": "[parameters('location')]",
+        "createdBy": "Azure Pipeline via ARM"
+      }
+    },
+
+    // Instrumentation
+    {
+      "type": "Microsoft.Insights/components",
+      "name": "[variables('fullApplicationName')]",
+      "kind": "web",
+      "apiVersion": "2020-02-02",
+      "location": "[parameters('location')]",
+      "tags": {
+          "service": "insights",
+          "application": "[parameters('appName')]",
+          "environment": "[parameters('environment')]",
+          "stage": "[parameters('stage')]",
+          "location": "[parameters('location')]",
+          "createdBy": "Azure Pipeline via ARM"
+      },
+      "properties": {
+          "applicationId": "[variables('fullApplicationName')]",
+          "Application_Type": "web",
+          "Flow_Type": "Bluefield"
+      }
+    },
+
+    // Application
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('fullApplicationName')]",
+      "apiVersion": "2018-11-01",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "tags": {
+        "service": "appservice",
+        "application": "[parameters('appName')]",
+        "environment": "[parameters('environment')]",
+        "stage": "[parameters('stage')]",
+        "location": "[parameters('location')]",
+        "createdBy": "Azure Pipeline via ARM"
+      },
+      "properties": {
+        "name": "[variables('fullApplicationName')]",
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "DOCKER_REGISTRY_SERVER_URL",
+              "value": "[concat('https://', reference(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2021-09-01').loginServer)]"
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+              "value": "[listCredentials(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2017-10-01').username]"
+            },
+            {
+              "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+              "value": "[listCredentials(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2017-10-01').passwords[0].value]"
+            },
+            {
+              "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+              "value": "false"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components/', variables('fullApplicationName')), '2020-02-02').InstrumentationKey]"
+            },
+            {
+              "name": "WEBSITES_PORT",
+              "value": "8080"
+            }
+          ],
+          "linuxFxVersion": "[concat('DOCKER|', reference(resourceId(subscription().subscriptionId, variables('acrResourceGroup'), 'Microsoft.ContainerRegistry/registries', variables('acrName')), '2021-09-01').loginServer, '/', parameters('appName'))]",
+          "acrUseManagedIdentityCreds": true,
+          "httpLoggingEnabled": true
+        },
+        "serverFarmId": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Web/serverfarms/', variables('fullApplicationName'), '-serviceplan')]",
+        "hostingEnvironment": "",
+        "tags": {
+          "service": "application",
+          "application": "[parameters('appName')]",
+          "environment": "[parameters('environment')]",
+          "stage": "[parameters('stage')]",
+          "location": "[parameters('location')]",
+          "createdBy": "Azure Pipeline via ARM"
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', concat(variables('fullApplicationName'), '-serviceplan'))]",
+        "[resourceId('microsoft.insights/components/', variables('fullApplicationName'))]"
+      ]
+    },
+
+  // Identity
+  {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2020-10-01",
+      "name": "[concat(variables('fullApplicationName'), '-roleassignment')]",
+      "resourceGroup": "[variables('acrResourceGroup')]",
+      "properties": {
+        "mode": "Incremental",
+        "parameters": {},
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {},
+          "parameters": {},
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2020-04-01-preview",
+              "name": "[guid(concat('Microsoft.Web/sites/', variables('fullApplicationName')))]",
+              "properties": {
+                "roleDefinitionId": "[variables('acrPullRoleDefinitionId')]",
+                "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('fullApplicationName')),'2019-08-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Web/sites/', variables('fullApplicationName'))]"
+      ]
+    }
+
+  ]
+}

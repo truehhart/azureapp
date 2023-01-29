@@ -1,0 +1,89 @@
+# Staging deployment pipeline is triggered once a new container revision has been built.
+# It's tasks are simple - to run staging deployment and check the deployed container by running tests.
+name: 'run-staging-deployment'
+trigger: ['none']
+resources:
+  pipelines:
+  - pipeline: 'run-staging-deployment'
+    source: 'build-azureapp-on-changes'
+    trigger: true
+
+variables:
+  vmImage: 'ubuntu-latest'
+  acrEnvironment: 'management'
+  acrStage:       'truehhart'
+  location:     'westeurope'
+  environment:  'staging'
+  stage:        'truehhart'
+  appName:      'azureapp'
+  subscriptionName: 'main'
+
+stages:
+- stage: 'deploy_to_staging'
+  displayName: 'Deploying ${{ variables.appName }} to staging'
+  jobs:
+  - job: 'release_application_to_staging'
+    displayName: 'Releasing ${{ variables.appName }} to staging'
+    pool:
+      vmImage: $(vmImage)
+    steps:
+      # Unfortunately, I hasn't found a way for AzPipelines to reliably pass information between pipelines, but I still wanted to have them separate.
+      # So we repeat the tasks to get build version from the previous pipeline.
+      - task: CmdLine@2
+        name: 'get_source_version'
+        displayName: '[Build] Getting current source version'
+        inputs:
+          workingDirectory: '$(Build.Repository.LocalPath)'
+          script: 'version=`cat ./src/$(appName)/.version`; echo "##vso[task.setvariable variable=version;isOutput=true]$version"'
+      - task: CmdLine@2
+        name: 'get_source_revision'
+        displayName: '[Build] Getting current git revision'
+        inputs:
+          script: 'revision=`echo "$(Build.SourceVersion)" | head -c 7`; echo "##vso[task.setvariable variable=revision;isOutput=true]$revision"'
+
+      # This task finalises the deployment by providing the correct values and image to the deployment.
+      - task: AzureRmWebAppDeployment@3
+        displayName: '[Deploy] Deploying $(appName) to $(environment)-$(stage)'
+        inputs:
+          ConnectedServiceName: '$(subscriptionName)-sc'
+          appType: 'applinux'
+          WebAppName: '$(environment)-$(stage)-$(appName)'
+          DockerNamespace: '$(acrEnvironment)$(acrStage)acr.azurecr.io'
+          DockerRepository: '$(Build.Repository.Name)'
+          DockerImageTag: '$(get_source_version.version).$(get_source_revision.revision)'
+          WebAppUri: 'webAppUrl'
+          TakeAppOfflineFlag: true
+          UseWebDeploy: true
+          RenameFilesFlag: true
+          AppSettings: '-HTTP_LISTEN_PORT 8080 -APP_MESSAGE "Hello world from $(environment)" -APP_ENVIRONMENT "$(environment)-$(stage)" -APP_REVISION $(get_source_version.version).$(get_source_revision.revision)'
+
+      # Set appUrl variable for next stage
+      - task: CmdLine@2
+        name: 'set_webapp_url'
+        displayName: '[Outputs] Set the appUrl output variable'
+        inputs:
+          script: 'appUrl=`echo "$(webAppUrl)"`; echo "##vso[task.setvariable variable=appUrl;isOutput=true]$appUrl"'
+
+      # Finally, output the deployment's URL to stdout in Azure Pipelines
+      - task: CmdLine@2
+        displayName: '[Outputs] Echo the WebApp url'
+        inputs:
+          script: 'echo $(set_webapp_url.appUrl)'
+
+- stage: 'run_tests_on_staging'
+  variables:
+    webAppUrl: $[ stageDependencies.deploy_to_staging.release_application_to_staging.outputs['set_webapp_url.appUrl'] ]
+    revision: $[ stageDependencies.deploy_to_staging.release_application_to_staging.outputs['get_source_revision.revision'] ]
+    version: $[ stageDependencies.deploy_to_staging.release_application_to_staging.outputs['get_source_version.version'] ]
+  displayName: 'Running tests'
+  jobs:
+  - job: 'run_test'
+    displayName: '[Test] Running tests for ${{ variables.appName }} staging deployment'
+    pool:
+      vmImage: $(vmImage)
+    steps:
+      - task: Go@0
+        inputs:
+          command: 'test'
+          arguments: -v -rev "$(version).$(revision)" -msg "Hello world from $(environment)" -url "$(webAppUrl)"
+          workingDirectory: 'src/azureapp'

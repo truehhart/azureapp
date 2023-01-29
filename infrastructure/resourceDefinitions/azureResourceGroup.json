@@ -1,0 +1,29 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {
+      "rgName": "[concat(parameters('environment'), '-', parameters('stage'), '-rg')]"
+    },
+    "parameters": {
+      "environment": {"type": "string", "metadata": {"description": "Azure Deployment Environment"}},
+      "stage": {"type": "string", "metadata": {"description": "Azure Deployment Stage"}},
+      "location": {"type": "string", "metadata": {"description": "Azure Deployment Location"}, "defaultValue": "westeurope"}
+      
+    },
+    "resources": [
+      {
+          "name": "[variables('rgName')]",
+          "type": "Microsoft.Resources/resourceGroups",
+          "apiVersion": "2021-04-01",
+          "location": "[parameters('location')]",
+          "dependsOn": [],
+          "tags": {
+            "service": "resourcegroup",
+            "environment": "[parameters('environment')]",
+            "stage": "[parameters('stage')]",
+            "location": "[parameters('location')]",
+            "createdBy": "Azure Pipeline via ARM"
+          }
+      }
+    ]
+}

@@ -1,0 +1,52 @@
+.general-text {
+  text-align: auto;
+  margin: 10px auto;
+  font-family: 'Roboto', sans-serif;
+}
+
+.container {
+  text-align: center;
+  height: auto;
+  position: relative;
+  margin: auto;
+}
+
+.vertical-center {
+  text-align: center;
+  display: block;
+  position: absolute;
+  top: 50%;
+}
+
+.click-me-button {
+  font-size: 24px;
+  margin: 15px auto;
+}
+
+.description-text-container {
+  height: fit-content;
+  width: 25%;
+  margin: 0 auto;
+}
+
+.description-text {
+  font-size: 20px;
+  margin: 10px auto;
+}
+
+.result-text-container {
+    height: 50px;
+    width: 40%;
+    margin: 0 auto;
+}
+
+.result-text {
+  font-size: 22px;
+  font-family: 'Source Code Pro', monospace;
+  animation: fadeIn 2s;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}

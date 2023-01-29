@@ -1,0 +1,73 @@
+# Since this is a testing pet-project - we'll be building our application every time it's source code has changed.
+# Note that we are only checking for feature, bugfix and release branches. 
+# Furthermore, we only want to build this pipeline if the source for the app has been changed. So, we specify the dir to search changes in for.
+trigger:
+  branches:
+    include: ['feature/*', 'bugfix/*', 'release/*']
+  paths:
+    include: ['src/azureapp/*']
+
+name: 'build-azureapp-on-changes'
+variables:
+  # These variables are set during runtime
+  revision:
+  version:
+  # We use a 'shared' management environment to host docker containers.
+  # This would ensure that production would get the same image that was tested on staging
+  # It also appears to be the best practice recommended by Azure. Win-win.
+  vmImage: 'ubuntu-latest'
+  subscriptionName: 'main'
+  environment: 'management'
+  stage:       'truehhart'
+  appName:     'azureapp'
+
+stages:
+# This stage is focused around building the application.
+# We could also sqeeze in the deployment in here, but generally in practice it proved better to split resources logically.
+# As such, I have decided to have CI and CD pipelines to be separate.
+- stage: 'build'
+  displayName: 'Building ${{ variables.appName }}'
+  jobs:
+  - job: 'build_and_push_container'
+    pool: 
+      vmImage: $(vmImage)
+    steps:
+      # For CD we are going to utlize the fact that "triggered" builds follow the same branch/revision that the job that has triggered them.
+      # As such, we don't have to worry about newer commits appearing during the job - the pipeline chain will work with the same revision.
+      # This also allows us to have a deterministic container versioning procedure, where we don't have to rely on build numbers.
+      - task: CmdLine@2
+        displayName: '[Build] Getting current source version'
+        inputs:
+          workingDirectory: '$(Build.Repository.LocalPath)'
+          script: 'version=`cat ./src/$(appName)/.version`; echo "##vso[task.setvariable variable=version]$version"'
+      # I want all containers to not only be tagged with the version number from source, but also include the git revision.
+      # Helps with identification and can be used in the future for troubleshooting, etc.
+      - task: CmdLine@2
+        displayName: '[Build] Getting current git revision'
+        inputs:
+          script: 'revision=`echo "$(Build.SourceVersion)" | head -c 7`; echo "##vso[task.setvariable variable=revision]$revision"'
+
+      # I've decided to go with the @1 revision of the Docker task to streamline the pipeline.
+      # Docker@2 would require setting up a container registry connection before being able to push images.
+      # Docker@1 only requires the subscription connection. So we can just set up Azure SC 1 time and forget about it.
+      - task: Docker@1
+        displayName: '[Build] Building ${{ variables.appName }} container image'
+        inputs:
+          containerregistrytype: 'Azure Container Registry'
+          azureSubscriptionEndpoint: '$(subscriptionName)-sc'
+          command: 'Build an image'
+          imageName: '$(Build.Repository.Name):$(version).$(revision)'
+          Dockerfile: 'build/dockerfiles/$(appName).Dockerfile'
+          useDefaultContext: false
+          buildContext: '$(Build.Repository.LocalPath)'
+          azureContainerRegistry: '$(environment)$(stage)acr.azurecr.io'
+
+      # Note that we are pushing the container to the management repository.
+      - task: Docker@1
+        displayName: '[Build] Pushing ${{ variables.appName }} to container registry'
+        inputs:
+          containerregistrytype: 'Azure Container Registry'
+          azureSubscriptionEndpoint: '$(subscriptionName)-sc'
+          command: 'Push an image'
+          imageName: '$(Build.Repository.Name):$(version).$(revision)'
+          azureContainerRegistry: '$(environment)$(stage)acr.azurecr.io'
