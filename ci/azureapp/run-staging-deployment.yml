@@ -21,8 +21,10 @@ variables:
 
 stages:
 - stage: 'deploy_to_staging'
+  displayName: 'Deploying ${{ variables.appName }} to staging'
   jobs:
   - job: 'release_application_to_staging'
+    displayName: 'Releasing ${{ variables.appName }} to staging'
     pool:
       vmImage: $(vmImage)
     steps:
@@ -59,3 +61,16 @@ stages:
         displayName: '[Outputs] Echo the WebApp url'
         inputs:
           script: 'echo $(webAppUrl)'
+- stage: 'run_tests_on_staging'
+  displayName: 'Running tests'
+  jobs:
+  - job: 'run_test'
+    displayName: '[Test] Running tests for ${{ variables.appName }} staging deployment'
+    pool:
+      vmImage: $(vmImage)
+    steps:
+      - task: Go@0
+        inputs:
+          command: 'test'
+          arguments: '-v -rev "$(version).$(revision)" -msg "HeHello world from $(environment)" -url "$(webAppUrl)"'
+          workingDirectory: 'src/azureapp'
