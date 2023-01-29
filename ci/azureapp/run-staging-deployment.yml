@@ -1,3 +1,5 @@
+# Staging deployment pipeline is triggered once a new container revision has been built.
+# It's tasks are simple - to run staging deployment and check the deployed container by running tests.
 name: 'run-staging-deployment'
 trigger: ['none']
 resources:

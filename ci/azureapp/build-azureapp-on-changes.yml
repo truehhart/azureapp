@@ -1,4 +1,6 @@
-# We want to be building this job on every pull request from the "feature", "bugfix" and "release" branch PR to cover the full SDLC.
+# Since this is a testing pet-project - we'll be building our application every time it's source code has changed.
+# Note that we are only checking for feature, bugfix and release branches. 
+# Furthermore, we only want to build this pipeline if the source for the app has been changed. So, we specify the dir to search changes in for.
 trigger:
   branches:
     include: ['feature/*', 'bugfix/*', 'release/*']
@@ -12,6 +14,7 @@ variables:
   version:
   # We use a 'shared' management environment to host docker containers.
   # This would ensure that production would get the same image that was tested on staging
+  # It also appears to be the best practice recommended by Azure. Win-win.
   vmImage: 'ubuntu-latest'
   subscriptionName: 'main'
   environment: 'management'

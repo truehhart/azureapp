@@ -21,6 +21,7 @@ stages:
   displayName: 'Deploying Management Infrastructure'
   jobs:
   - job: 'deploy_azure_resources'
+    displayName: 'Deploying Azure Resources'
     pool:
       vmImage: $(vmImage)
     steps:
