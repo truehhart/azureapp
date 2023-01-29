@@ -60,3 +60,9 @@ stages:
           UseWebDeploy: true
           RenameFilesFlag: true
           AppSettings: '-HTTP_LISTEN_PORT 8080 -APP_MESSAGE "Hello world from $(environment)" -APP_ENVIRONMENT "$(environment)-$(stage)" -APP_REVISION $(get_source_version.version).$(get_source_revision.revision)'
+
+      # Finally, output the deployment's URL to stdout in Azure Pipelines
+      - task: CmdLine@2
+        displayName: '[Outputs] Echo the WebApp url'
+        inputs:
+          script: 'echo $(webAppUrl)'
